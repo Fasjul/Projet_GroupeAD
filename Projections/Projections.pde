@@ -1,5 +1,5 @@
 void setup() {
-  size(1000, 1000, JAVA2D);
+  size(1000,1000, P2D);
   frameRate(100);
 }
 

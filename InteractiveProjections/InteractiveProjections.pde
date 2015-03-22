@@ -30,7 +30,7 @@
 //////////////////////////
 
 void setup() {
-  size(img_w, img_h, JAVA2D);
+  size(img_w,img_h,P2D);
   frameRate(20);
 }
 
