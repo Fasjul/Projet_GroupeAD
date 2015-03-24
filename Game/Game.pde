@@ -235,6 +235,13 @@ class Mover {
     for(ClosedCylinder cyl : obstacles.obstacleList){
       if(cyl.collisionWithMover(this)){
         PVector normal = new PVector(cyl.location.x- this.location.x, 0 , cyl.location.z-this.location.z);
+
+        PVector n = normal.get();
+        this.location.add(n);
+        n.normalize();
+        n.mult(this.radius+cyl.radius+0.01f);
+        this.location.sub(n);
+        
         normal.normalize();
         normal.mult(velocity.dot(normal));
         normal.mult(2);
