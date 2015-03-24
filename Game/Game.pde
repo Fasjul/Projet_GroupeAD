@@ -12,12 +12,8 @@ int zoom = -150;
 // Shape and Mover
 float c2 = 255;
 float c3 = 255;
-int cylinderBaseSize = 20;
-int cylinderHeight = 50;
-int cylinderResolution = 40;
 
 boolean mouseClick =  false;
-ClosedCylinder ghost = new ClosedCylinder();
 
 void setup() {
   size(600, 600, P3D);
@@ -29,9 +25,13 @@ void setup() {
 
   int ballRadius = 10;
 
+  int cylinderBaseRadius = 20;
+  int cylinderBaseHeight = 50;
+  int cylinderResolution = 40;
+
   Box box = new Box(boxWidth, boxHeight, boxDepth);
   Mover mover = new Mover(ballRadius);
-  ObstacleManager obstacles = new ObstacleManager();
+  ObstacleManager obstacles = new ObstacleManager(cylinderBaseRadius, cylinderBaseHeight, cylinderResolution);
   game = new GameManager(box, mover, obstacles);
 
   bX = width/2;
@@ -53,13 +53,7 @@ void keyPressed() {
   if(key == CODED) {
     if(keyCode == SHIFT){
       game.hold = true;
-    } /*else if(keyCode == LEFT) {
-      game.rotY -= PI/32;
-      game.rotY %= 2*PI;
-    } else if(keyCode == RIGHT) {
-      game.rotY += PI/32;
-      game.rotY %= 2*PI;
-    }*/
+    }
   }
 }
 
@@ -90,25 +84,20 @@ void mousePressed() {
 }
 
 void mouseClicked(){
-  if(game.hold && (!ghost.collisionWithMover(game.mover))){
-    if(mouseButton == LEFT){
-      float x = clamp(mouseX, 124, 600-124);
-      float y = clamp(mouseY, 124, 600-124);
-
-      x = map(x, 124, 600-124, -game.box.width/2, game.box.width/2);
-      y = map(y, 124, 600-124, -game.box.depth/2, game.box.depth/2);
-
-      ClosedCylinder toAdd = new ClosedCylinder(new PVector(x,0,y),cylinderBaseSize,cylinderHeight,cylinderResolution);
-      toAdd.setColor(255,255,51);
-      game.obstacles.add(toAdd);
+  ClosedCylinder ghost = game.obstacles.ghost;
+  if(game.hold && (!ghost.collisionWithMover(game.mover))) {
+    if(mouseButton == LEFT) {
+      ClosedCylinder toAdd = game.obstacles.add(getGamePos(mouseX, mouseY));
+      toAdd.setColor(255, 255, 51);
       mouseClick = true;
    
-    }else if(mouseButton == RIGHT){
-      if(!game.obstacles.obstacleList.isEmpty()){
-        for(int i = 0; i<game.obstacles.obstacleList.size();i++){
-          if(ghost.collisionWithCylinder(game.obstacles.obstacleList.get(i))){
+    } else if(mouseButton == RIGHT) {
+      if(!game.obstacles.obstacleList.isEmpty()) {
+        for(int i = 0; i<game.obstacles.obstacleList.size();i++) {
+          if(ghost.collisionWithCylinder(game.obstacles.obstacleList.get(i))) {
             game.obstacles.obstacleList.remove(i);
-           }
+
+          }
         }
       }
     }
@@ -120,17 +109,17 @@ void mouseClicked(){
 
 void mouseReleased() {
   if(!game.hold){
-  bX = Math.round(clamp(bX, 0, width));
-  bY = Math.round(clamp(bY, 0, height)); 
-  noStroke();
+    bX = Math.round(clamp(bX, 0, width));
+    bY = Math.round(clamp(bY, 0, height)); 
+    noStroke();
   }
 }
 
 void mouseWheel(MouseEvent event){
   float e = event.getCount();
   mouseScroll += e;
-  mouseScroll = (int)clamp(mouseScroll,-99,99);
-  //game.speed = (float)Math.pow(2f, mouseScroll/25f);
+  mouseScroll = (int)clamp(mouseScroll,-100,100);
+  game.speed = (float)Math.pow(2f, mouseScroll/25f);
 }
 
 void mouseDragged() {
@@ -140,11 +129,7 @@ void mouseDragged() {
   bY = mouseY - mY; 
   game.rotX = map(bY, 0, height, PoT, -PoT);
   game.rotZ = map(bX, 0,  width, -PoT, PoT);  
-  if(clampBool(bX, 0, width) || clampBool(bY, 0, height)) {
-    //stroke(200, 50, 50);
-  } else {
-    noStroke();
-  }
+  noStroke();
   game.rotX = clamp(game.rotX, -PoT, PoT);
   game.rotZ = clamp(game.rotZ, -PoT, PoT);
   }
@@ -165,6 +150,19 @@ float clamp(float a, float min, float max) {
 
 }
 
+PVector getGamePos(int mouseX, int mouseY) {
+  float x = clamp(mouseX, 124, 600-124);
+  float y = clamp(mouseY, 124, 600-124);
+
+  x = map(x, 124, 600-124, -game.box.width/2, game.box.width/2);
+  y = map(y, 124, 600-124, -game.box.depth/2, game.box.depth/2);
+
+  return new PVector(x,y);
+}
+PVector getGamePos(PVector screenPos) {
+  return getGamePos((int)screenPos.x, (int)screenPos.y);
+}
+
 class Mover {
   final float GRAVITY_CONSTANT = 0.1;
   final float BOUNCING_COEFF = 1;
@@ -179,18 +177,17 @@ class Mover {
   PVector frictionForce;
   
   Mover(int radius) {
-    location = new PVector(0,0,0);
-    velocity = new PVector(0,0,0);
-    gravityForce = new PVector(0,0,0);
-    frictionForce = new PVector(0,0,0);
+    location = new PVector(0,0);
+    velocity = new PVector(0,0);
+    gravityForce = new PVector(0,0);
+    frictionForce = new PVector(0,0);
 
     this.radius = radius;
   }
   
   void update(){
     gravityForce.x = sin(game.rotZ)*GRAVITY_CONSTANT;
-    gravityForce.z = sin(game.rotX)*GRAVITY_CONSTANT*(-1);
-    //gravityForce.y = (-1)*GRAVITY_CONSTANT;
+    gravityForce.y = sin(game.rotX)*GRAVITY_CONSTANT*(-1);
     
     float frictionMagnitude = NORMALFORCE_COEFF*MU;
     PVector frictionForce = velocity.get();
@@ -221,20 +218,20 @@ class Mover {
       location.x = -game.box.width/2;
       velocity.x = velocity.x*(-1)*BOUNCING_COEFF;
     }
-    if(location.z>=game.box.depth/2){
-      location.z = game.box.depth/2;
-      velocity.z = velocity.z*(-1)*BOUNCING_COEFF;
+    if(location.y>=game.box.depth/2){
+      location.y = game.box.depth/2;
+      velocity.y = velocity.y*(-1)*BOUNCING_COEFF;
     }
-    if(location.z<=-game.box.depth/2){
-      location.z = -game.box.depth/2;
-      velocity.z = velocity.z*(-1)*BOUNCING_COEFF;
+    if(location.y<=-game.box.depth/2){
+      location.y = -game.box.depth/2;
+      velocity.y = velocity.y*(-1)*BOUNCING_COEFF;
     }
   }
 
   void checkCylinderCollision(ObstacleManager obstacles){
     for(ClosedCylinder cyl : obstacles.obstacleList){
       if(cyl.collisionWithMover(this)){
-        PVector normal = new PVector(cyl.location.x- this.location.x, 0 , cyl.location.z-this.location.z);
+        PVector normal = new PVector(cyl.location.x - this.location.x, cyl.location.y - this.location.y);
 
         PVector n = normal.get();
         this.location.add(n);
@@ -261,6 +258,7 @@ class GameManager {
   float rotY = 0f;
   float rotZ = 0f;
 
+  float speed = 1f;
   boolean hold = false;
 
   GameManager(Box box, Mover mover, ObstacleManager obstacles) {
@@ -287,7 +285,7 @@ class GameManager {
         obstacles.draw();
 
         pushMatrix();
-          translate(mover.location.x, -box.height/2-mover.radius, mover.location.z);
+          translate(mover.location.x, -box.height/2-mover.radius, mover.location.y);
           mover.update();
           mover.checkEdges();
           mover.checkCylinderCollision(obstacles);
@@ -307,19 +305,13 @@ class GameManager {
         box.draw();
         obstacles.draw();
 
-        translate(mover.location.x, -20, mover.location.z);
+        translate(mover.location.x, -20, mover.location.y);
         mover.draw();
       popMatrix();
       
-      ghost.setGhost();
+      ClosedCylinder ghost = game.obstacles.ghost;
 
-      float x = clamp(mouseX, 124, 600-124);
-      float y = clamp(mouseY, 124, 600-124);
-
-      x = map(x, 124, 600-124, -game.box.width/2, game.box.width/2);
-      y = map(y, 124, 600-124, -game.box.depth/2, game.box.depth/2);
-
-      ghost.move(new PVector(x,0,y));
+      ghost.move(getGamePos(mouseX, mouseY));
       if(ghost.collisionWithMover(mover)){
         stroke(color(230,0,0));
       } else {
@@ -348,14 +340,33 @@ class Box implements Drawable {
 }
 
 class ObstacleManager implements Drawable {
-  ArrayList<ClosedCylinder> obstacleList;
+  final ArrayList<ClosedCylinder> obstacleList;
+  final ClosedCylinder ghost;
 
-  ObstacleManager() {
+  final float BASE_HEIGHT;
+  final float BASE_RADIUS;
+  final int BASE_RESOLUTION;
+
+  ObstacleManager(float baseHeight, float baseRadius, int baseResolution) {
     this.obstacleList = new ArrayList<ClosedCylinder>();
+
+    this.BASE_HEIGHT = baseHeight;
+    this.BASE_RADIUS = baseRadius;
+    this.BASE_RESOLUTION = baseResolution;
+
+    ghost = new ClosedCylinder(new PVector(0,0), BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
+    ghost.setGhost();
   }
   
-  void add(ClosedCylinder obstacle) {
+  ClosedCylinder add(ClosedCylinder obstacle) {
     obstacleList.add(obstacle);
+    return obstacle;
+  }
+
+  ClosedCylinder add(PVector position) {
+    ClosedCylinder cyl = new ClosedCylinder(position, BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
+    obstacleList.add(cyl);
+    return cyl;
   }
   
   boolean contains(ClosedCylinder c){
@@ -382,7 +393,7 @@ interface Drawable {
 class ClosedCylinder implements Drawable {
   PVector location;
   float radius;
-  float cylHeight;
+  float height;
   int resolution;
 
   boolean ghost = false;
@@ -394,34 +405,39 @@ class ClosedCylinder implements Drawable {
     this.location = new PVector(0,0,0);
   }
 
-  ClosedCylinder(PVector location, float radius, float cylHeight, int resolution){
-    this.location = new PVector(location.x, location.y, location.z);
+  ClosedCylinder(PVector location, float radius, float height, int resolution){
+    this.location = new PVector(location.x, location.y);
     this.radius = radius;
-    this.cylHeight = cylHeight;
+    this.height = height;
     this.resolution = resolution;
   }
   
   void move(PVector newLocation){
-     location = new PVector(newLocation.x, newLocation.y, newLocation.z);
+     location = new PVector(newLocation.x, newLocation.y);
   }
   
   boolean collisionWithMover(Mover mover){
-    float distX = (location.x-mover.location.x);
-    float distY = (location.z-mover.location.z);
+    float distX = (mover.location.x - this.location.x);
+    float distY = (mover.location.y - this.location.y);
     float squareDist = distX*distX + distY*distY;
-    float squareRadius = (radius+mover.radius)*(radius+mover.radius);
-    
+
+    float totRadius = this.radius + mover.radius;
+    float squareRadius = totRadius*totRadius;
+
+    return squareDist <= squareRadius;
+  }
+
+  boolean collisionWithCylinder(ClosedCylinder that){
+    float distX = (that.location.x - this.location.x);
+    float distY = (that.location.y - this.location.y);
+    float squareDist = distX*distX + distY*distY;
+
+    float totRadius = this.radius + that.radius;
+    float squareRadius = totRadius*totRadius;
+
     return squareDist <= squareRadius;
   }
   
-  boolean collisionWithCylinder(ClosedCylinder cyl){
-    float distX = (location.x-cyl.location.x);
-    float distY = (location.z-cyl.location.z);
-    float squareDist = distX*distX + distY*distY;
-    float squareRadius = (radius+cyl.radius)*(radius+cyl.radius);
-    
-    return squareDist <= squareRadius; 
-  }
   void setColor(float R, float G, float B){
     this.R = R;
     this.G = G;
@@ -434,48 +450,53 @@ class ClosedCylinder implements Drawable {
   
   void draw(){
     pushMatrix();
-    translate(location.x,-game.box.height+10,location.z);
-    rotateX(PI/2);
-    float angle;
-    float [] x = new float [cylinderResolution + 1];
-    float [] y = new float [cylinderResolution + 1];
-    
-    //get the x and y position
-    for(int i = 0; i< x.length; i++){
-      angle = (TWO_PI / cylinderResolution)*i;
-      x[i] = sin(angle) * cylinderBaseSize;
-      y[i] = cos(angle) * cylinderBaseSize;
-    }
-    PShape o = createShape();
-    beginShape(QUAD_STRIP);
-    if(ghost) {
-      fill(color(255,255,224,100));
-    } else {
-      fill(color(R,G,B));
-    }
-    //draw the border of the cylinder
-    for(int i = 0; i<x.length; i++){
-      vertex(x[i], y[i], 0);
-      vertex(x[i], y[i], cylinderHeight);
-    }
-      vertex(x[0],y[0],0);
-      vertex(x[0], y[0], cylinderHeight);
-    //top surface
-    for(int i = 0; i<x.length; i++){
-      vertex(0,0,cylinderHeight);
-      vertex(x[i],y[i],cylinderHeight);
-    }
-      vertex(0,0,cylinderHeight);
-      vertex(x[0],y[0],cylinderHeight);
-    //bottom surface
-   for(int i = 0; i<x.length; i++){
-      vertex(0,0,0);
-      vertex(x[i],y[i],0);
-    }
-      vertex(0,0,0);
-      vertex(x[0],y[0],0);
-    endShape();
-    noFill();
+      translate(location.x, -game.box.height/2, location.y);
+      rotateX(PI/2);
+
+      float angle;
+      float[] x = new float [resolution + 1];
+      float[] y = new float [resolution + 1];
+      
+      //get the x and y position
+      for(int i = 0; i< x.length; i++){
+        angle = (TWO_PI / resolution)*i;
+        x[i] = sin(angle) * radius;
+        y[i] = cos(angle) * radius;
+      }
+
+      beginShape(QUAD_STRIP);
+        if(ghost) {
+          fill(color(255, 255, 224, 100));
+        } else {
+          fill(color(R, G, B));
+        }
+
+        //draw the border of the cylinder
+        for(int i = 0; i<x.length; i++){
+          vertex(x[i], y[i], 0);
+          vertex(x[i], y[i], height);
+        }
+        vertex(x[0], y[0], 0);
+        vertex(x[0], y[0], height);
+
+        //top surface
+        for(int i = 0; i<x.length; i++){
+          vertex(   0,    0, height);
+          vertex(x[i], y[i], height);
+        }
+        vertex(   0,    0, height);
+        vertex(x[0], y[0], height);
+
+        //bottom surface
+        for(int i = 0; i<x.length; i++){
+          vertex(   0,    0, 0);
+          vertex(x[i], y[i], 0);
+        }
+        vertex(   0,    0, 0);
+        vertex(x[0], y[0], 0);
+      endShape();
+
+      noFill();
     popMatrix();
   }
 }
