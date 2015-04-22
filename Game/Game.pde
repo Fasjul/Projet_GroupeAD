@@ -9,10 +9,6 @@ int mouseScroll = 0;
 
 int zoom = -150;
 
-// Shape and Mover
-float c2 = 255;
-float c3 = 255;
-
 boolean mouseClick =  false;
 
 void setup() {
