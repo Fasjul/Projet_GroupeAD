@@ -4,7 +4,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import tools.HScrollbar;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "unused"})
 public class BasicImageProcessing extends PApplet {
 
 	private PImage img;
