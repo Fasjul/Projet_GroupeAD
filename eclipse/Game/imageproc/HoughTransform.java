@@ -3,6 +3,7 @@ import processing.core.PImage;
 import processing.core.PApplet;
 import processing.video.Capture;	
 
+@SuppressWarnings("serial")
 public class HoughTransform extends PApplet{
 
 	Capture cam;
@@ -19,14 +20,14 @@ public class HoughTransform extends PApplet{
 				println(i+". "+cameras[i]);
 			}
 			if(cameras.length>26){
-			cam = new Capture(this,cameras[1]);
-			println("Selected : "+cameras[1]);
-			}else{
-			cam = new Capture(this,cameras[0]);
+				cam = new Capture(this,cameras[1]);
+				println("Selected : "+cameras[1]);
+			} else {
+				cam = new Capture(this,cameras[0]);
 			}
 			cam.start();
-			}
 		}
+	}
 	public void draw(){
 		if(cam.available()==true){
 			cam.read();
