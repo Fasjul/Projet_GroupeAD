@@ -2,6 +2,7 @@ package imageproc;
 
 import processing.core.PApplet;
 import processing.core.PImage;
+import processing.video.Capture;
 
 public class ImageProcessing extends PApplet {
 	/**
@@ -10,14 +11,22 @@ public class ImageProcessing extends PApplet {
 	private static final long serialVersionUID = 1634966782356685343L;
 	
 	private PImage image;
-	private PImage drawing;
+	private PImage result;
+	private Capture cam;
+	float discretizationStepPhi = 0.006f;
+	float discretizationStepR = 2.5f;
 
 	@Override
 	public void setup() {
-		image = loadImage("resources/boards/board1.jpg");
+	//	size(640,480);
+		image = loadImage("resources/boards/board2.jpg");
+		/*camStart();
+		if(cam.available()==true){
+			cam.read();
+		}
+		image = cam.get();
+		*/
 		size(image.width, image.height);
-		
-		test();
 	}
 	
 	public void test() {
@@ -76,21 +85,61 @@ public class ImageProcessing extends PApplet {
 		System.out.println("\"Parallel\" all took " + (stop-start) + "ms");
 		
 	// Draw
-		drawing = applyAll(image);
-		image(drawing, 0, 0);
+		result = applyAll(image);
+		image(result, 0, 0);
 		
 	}
 	
 	
 	
 	@Override
-	public void draw() {
-//		result = sobel(hsbFilter(gaussianBlur(image)));
-//		image(result, 0, 0);
-//		hough(result);
+	public void draw(){
+		//drawCam();
+		drawPic();
+	}
+	private void drawCam(){
+		if(cam.available()==true){
+			cam.read();
+		}
+		image = cam.get();
+		result = sobel(hsbFilter(gaussianBlur(image)));
+		image(result,0,0);
+		hough(result);
+	}
+	private void drawPic(){
+		image = loadImage("resources/boards/board4.jpg");
+		result = applyAll(image);
+		image(image,0,0);
+		hough(result);
 	}
 	
-	
+	public boolean camStart(){
+		String[] cameras = Capture.list();
+		if(cameras.length == 0){
+			println("There are no camera available for capture.");
+			image = loadImage("resources/boards/board1.jpg");
+			exit();
+			return true;
+		}else{
+			println("Available cameras :");
+			for(int i =0 ; i<cameras.length;i++){
+				println(i+". "+cameras[i]);
+			}
+			if(cameras.length>26){
+				cam = new Capture(this,cameras[1]);
+				println("Selected : "+cameras[1]);
+			} else {
+				cam = new Capture(this,cameras[0]);
+			}
+			cam.start();
+			if(cam.available()==true){
+				cam.read();
+			}
+			image = cam.get();
+			return true;
+		}
+	}
+
 	
 	public int clamp(int val, int min, int max) {
 		if(val < min) {
@@ -174,9 +223,9 @@ public class ImageProcessing extends PApplet {
 					int x1 = clamp(x+k1-1, 0, img.width-1);
 					int y1 = clamp(y+k2-1, 0, img.height-1);
 
-					r += gaussianKernel[k1][k2] * red(img.pixels[y1*width + x1]);
-					g += gaussianKernel[k1][k2] * green(img.pixels[y1*width + x1]);
-					b += gaussianKernel[k1][k2] * blue(img.pixels[y1*width + x1]);
+					r += gaussianKernel[k1][k2] * red(img.pixels[y1*img.width + x1]);
+					g += gaussianKernel[k1][k2] * green(img.pixels[y1*img.width + x1]);
+					b += gaussianKernel[k1][k2] * blue(img.pixels[y1*img.width + x1]);
 				}
 			}
 
@@ -316,46 +365,44 @@ public class ImageProcessing extends PApplet {
 	
 	
 	public void hough(PImage edgeImg){
-		float discretizationStepPhi = 0.006f;
-		float discretizationStepR = 2.5f;
 		
-		
-		//dimensions of the accumulator
-		int phiDim = (int)(Math.PI/discretizationStepPhi);
-		int rDim = (int)(((edgeImg.width+edgeImg.height)*2+1)/discretizationStepR);
-		
-		//accumulator with a 1pix margin around
-		int[] accumulator = new int[(phiDim+2)*(rDim+2)];
-		int rMax = rDim+2;
-		
-		//Fill the accumulator: on edge point (white pixel of the edgeImg), store all possible (r,phi) pair discribing 
-		//lines going through this point
-		for(int y = 0; y<edgeImg.height;y++){
-			for(int x = 0; x<edgeImg.width;x++){
-				//are we on edge?
-				if(brightness(edgeImg.pixels[y*edgeImg.width+x])!=0){
-					//...determine all the lines (r,phi) passing through
-					// pixel(x,y), convert(r, phi) to coordinates in accumulator, increment accumulator;
-					int i = 0;
-					for(float phi = 0; phi<Math.PI; phi+=discretizationStepPhi){
-						float r = (x)*cos(phi)+(y)*sin(phi);
-						if(r<0) r += (rDim - 1) / 2;
-						accumulator[(int)(i*rMax+floor(r))] ++;
-						i++;
+			//dimensions of the accumulator
+			int phiDim = (int)(Math.PI/discretizationStepPhi);
+			int rDim = (int)(((edgeImg.width+edgeImg.height)*2+1)/discretizationStepR);
+			
+			//accumulator with a 1pix margin around
+			int[] accumulator = new int[(phiDim+2)*(rDim+2)];
+			int rMax = rDim+2;
+			
+			//Fill the accumulator: on edge point (white pixel of the edgeImg), store all possible (r,phi) pair discribing 
+			//lines going through this point
+			for(int y = 0; y<edgeImg.height;y++){
+				for(int x = 0; x<edgeImg.width;x++){
+					//are we on edge?
+					if(brightness(edgeImg.pixels[y*edgeImg.width+x])!=0){
+						//...determine all the lines (r,phi) passing through
+						// pixel(x,y), convert(r, phi) to coordinates in accumulator, increment accumulator;
+						int i = 0;
+						for(float phi = 0; phi<Math.PI; phi+=discretizationStepPhi){
+							float r = (x)*cos(phi)+(y)*sin(phi);
+							
+							int index = (int)(r/discretizationStepR + (rDim-1)*0.5 + ((phi/discretizationStepPhi)+1)*(rDim+2)+1);
+							int index2 = (int)(1+phi/discretizationStepPhi)*(rDim+2);
+							
+							accumulator[(int)(index)] ++;
+							i++;
+							}
+						
 						}
-					
 					}
-				}
-					
-			}	
-		PImage houghImg = createImage(rDim+2,phiDim+2, ALPHA);
-		for(int i = 0; i<accumulator.length;i++){
-			houghImg.pixels[i] = color(min(255,accumulator[i]));
-		}
-		
-		houghImg.updatePixels();
-		
-		houghImg.save("resources/boards/Accumulator.png");
+						
+				}	
+			PImage houghImg = createImage(rDim+2,phiDim+2, ALPHA);
+			for(int i = 0; i<accumulator.length;i++){
+				houghImg.pixels[i] = color(min(255,accumulator[i]));
+			}
+			houghImg.updatePixels();
+			houghImg.save("resources/boards/Accumulator.png");
 	/////plotting the lines
 			for(int idx = 0; idx<accumulator.length;idx++){
 				if(accumulator[idx]>200){
@@ -364,9 +411,6 @@ public class ImageProcessing extends PApplet {
 					float r = (accR - (rDim-1)*0.5f)*discretizationStepR;
 					float phi = accPhi*discretizationStepPhi;
 					
-					// !!!!!!	A FIXER !!!!!!!
-					r = idx%rMax;
-					phi = idx/rMax;
 					
 				
 					//Cartesian equation of a line : y = ax+b
@@ -385,49 +429,31 @@ public class ImageProcessing extends PApplet {
 					int y3 = edgeImg.height;
 					int x3 = (int)(-(y3-r/sin(phi))*(sin(phi)/cos(phi)));
 			
-					int px = (int) (r*cos(phi));
-					int py = (int) (r*sin(phi));
-					
-					stroke(56,54,170);
-					noFill();
-					ellipse(px,py,25,25);
-				/*	System.out.println("========NOUVEAU POINT LUMINEUX========");
-					System.out.println("Phi : "+phi);
-					System.out.println("R : "+r);
-					
-					System.out.println("(x0,y0,x1,y1,x2,y2,x3,y3) = ("
-					+x0+","+y0+","+x1+","+y1+","+x2+","+y2+","+x3+","+y3+")");
-					
-					System.out.println(" ");
-				*/
+					int px = (int)(r*cos(phi));
+					int py = (int)(r*sin(phi));
 				//Finally, plot the lines
 					stroke(204,102,0);
 					//noStroke();
 					if(y0>0){
 						if(x1>0){
-							System.out.println("Selected = 1");
 							line(x0,y0,x1,y1);
 						}
 						else if(y2>0) {
-							System.out.println("Selected = 2");
-							 line(x0,y0,x2,y2);
+							 line(x0*cos(phi),y0*sin(phi),x2*cos(phi),y2*sin(phi));
 						}
 						else {
-							System.out.println("Selected = 3");
 							line(x0,y0,x3,y3);
 						}
 					}else{
 						if(x1>0){
 							if(y2>0){
-								System.out.println("Selected = 4");
 								line(x1,y1,x2,y2);
 							}
 							else {
-								System.out.println("Selected =5");
 								line(x1,y1,x3,y3);
 							}
 						}else{
-							System.out.println("Selected = 6");
+							
 							line(x2,y2,x3,y3);
 						}
 					}
