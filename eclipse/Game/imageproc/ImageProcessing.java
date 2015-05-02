@@ -44,7 +44,7 @@ public class ImageProcessing extends PApplet {
 		hough(result);
 	}
 	private void drawPic(){
-		image = loadImage("resources/boards/board4.jpg");
+		image = loadImage("resources/boards/board3.jpg");
 		result = sobel(hsbFilter(gaussianBlur(image)));
 		image(image,0,0);
 		hough(result);
