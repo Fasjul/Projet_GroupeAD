@@ -10,27 +10,87 @@ public class ImageProcessing extends PApplet {
 	private static final long serialVersionUID = 1634966782356685343L;
 	
 	private PImage image;
-	private PImage result;
+	private PImage drawing;
 
 	@Override
 	public void setup() {
 		image = loadImage("resources/boards/board1.jpg");
-		System.out.println("Largeur : "+image.width + ", Hauteur : "+image.height);
-		size(image.width, image.height);	
-		result = sobel(hsbFilter(gaussianBlur(image)));
-		image(result, 0, 0);
-		hough(result);
+		size(image.width, image.height);
+		
+		test();
+	}
+	
+	public void test() {
+		long start, stop;
+		
+	// Gaussian
+		// Gaussian sequential
+		start = System.currentTimeMillis();
+		gaussianBlur(image, 1);
+		stop = System.currentTimeMillis();
+		
+		System.out.println("Sequential gaussian took " + (stop-start) + "ms");
+		
+		// Gaussian parallel
+		start = System.currentTimeMillis();
+		gaussianBlur(image);
+		stop = System.currentTimeMillis();
+		
+		System.out.println("Parallel gaussian took " + (stop-start) + "ms");
+		
+	// HSB Filter
+		start = System.currentTimeMillis();
+		hsbFilter(image);
+		stop = System.currentTimeMillis();
+		
+		System.out.println("Sequential HSB took " + (stop-start) + "ms");
+		
+	// Sobel
+		// Sobel sequential
+		start = System.currentTimeMillis();
+		sobel(image, 1);
+		stop = System.currentTimeMillis();
+		
+		System.out.println("Sequential sobel took " + (stop-start) + "ms");
+		
+		// Sobel parallel
+		start = System.currentTimeMillis();
+		sobel(image, 1);
+		stop = System.currentTimeMillis();
+		
+		System.out.println("Parallel sobel took " + (stop-start) + "ms");
+		
+	// ALL
+		// ALL sequential
+		start = System.currentTimeMillis();
+		sobel(hsbFilter(gaussianBlur(image, 1)), 1);
+		stop = System.currentTimeMillis();
+				
+		System.out.println("Sequential all took " + (stop-start) + "ms");
+		
+		// ALL parallel
+		start = System.currentTimeMillis();
+		applyAll(image);
+		stop = System.currentTimeMillis();
+		
+		System.out.println("\"Parallel\" all took " + (stop-start) + "ms");
+		
+	// Draw
+		drawing = applyAll(image);
+		image(drawing, 0, 0);
 		
 	}
-
+	
+	
+	
 	@Override
 	public void draw() {
-		/*result = sobel(hsbFilter(gaussianBlur(image)));
-		image(result, 0, 0);
-		hough(result);
-		*/
+//		result = sobel(hsbFilter(gaussianBlur(image)));
+//		image(result, 0, 0);
+//		hough(result);
 	}
-
+	
+	
 	
 	public int clamp(int val, int min, int max) {
 		if(val < min) {
@@ -41,13 +101,67 @@ public class ImageProcessing extends PApplet {
 			return val;
 		}
 	}
-
+	
+	
+	
+	public PImage applyAll(PImage img) {
+		PImage inter1 = gaussianBlur(img);
+		PImage inter2 = hsbFilter(inter1);
+		PImage inter3 = sobel(inter2,1);
+		return inter3;
+	}
+	
+	
+	
 	public PImage gaussianBlur(PImage img) {
-		PImage res = createImage(img.width, img.height, RGB);
+		int nCores = Runtime.getRuntime().availableProcessors();
+		if(nCores < 1) {
+			System.out.println("Is your JVM correctly set up?");
+			throw new RuntimeException("Runtime.availableProcessors() did not give a valid answer!");
+		}
+		return gaussianBlur(img, Math.min(nCores, 4));
+	}
+	
+	public PImage gaussianBlur(final PImage img, int nOfThreads) {
+		Thread[] threads = new Thread[nOfThreads];
+		
+		final PImage result = createImage(img.width, img.height, RGB);
+		
+		int totalPixels = img.width*img.height;
+		int threadStep  = totalPixels/nOfThreads;
+		
+		for(int i=0; i<nOfThreads; i++) {
+			final int tFrom = i*threadStep;
+			final int tTo = (i+1)*threadStep;
+			
+			threads[i] = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					gaussianBlurOn(img, result, tFrom, tTo);
+				}
+			});
+		}
+		
+		for(int i=0; i<nOfThreads; i++) {
+			threads[i].start();
+		}
+		
+		try {
+			for(int i=0; i<nOfThreads; i++) {
+				threads[i].join();
+			}
+		} catch(InterruptedException e) {
+			System.out.println("Could not join all Threads in gaussianBlur... Did the system kill one?");
+		}
+		
+		return result;
+	}
 
+	private PImage gaussianBlurOn(PImage img, PImage res, int from, int to) {
 		float[][] gaussianKernel = new float[][] { {9, 12, 9}, {12, 15, 12}, {9, 12, 9} };
+		float s = 99f;
 
-		for(int i=0; i<img.width*img.height; i++) {
+		for(int i=from; i<to; i++) {
 			int x = i%img.width;
 			int y = i/img.width;
 
@@ -66,35 +180,130 @@ public class ImageProcessing extends PApplet {
 				}
 			}
 
-			int s = 0;
-			for(int j=0; j<gaussianKernel.length; j++) {
-				for(int jj=0; jj<gaussianKernel[j].length; jj++) {
-					s += gaussianKernel[j][jj];
-				}
-			}
-
 			res.pixels[i] = color(r/s, g/s, b/s);
 		}
 		
 		return res;
 	}
-
+	
+	
+	
 	public PImage hsbFilter(PImage img) {
-		float hueMin = 80f;
-		float hueMax = 140f;
+		float hueMin =  80f; // hue minimum
+		float hueMax = 140f; // hue maximum
 		
-		float bMin = 20f;
-		float bMax = 220;
+		float bMin =  30f;  // brightness minimum
+		float bMax = 200f;  // brightness maximum
 		
-		float sMin = 80f;
-
-		PImage res = createImage(img.width, img.height, RGB);
+		float sMin = 80f;  // saturation minimum
+		
+		PImage result = createImage(img.width, img.height, RGB);
 
 		for(int i=0; i<img.width*img.height; i++) {
 			float h = hue(img.pixels[i]);
 			float b = brightness(img.pixels[i]);
 			float s = saturation(img.pixels[i]);
 			if(h > hueMin && h < hueMax && b > bMin && b < bMax && s > sMin) {
+				result.pixels[i] = color(255);
+			} else {
+				result.pixels[i] = color(0);
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	
+	public PImage sobel(PImage img) {
+		int nCores = Runtime.getRuntime().availableProcessors();
+		if(nCores < 1) {
+			System.out.println("Is your JVM correctly set up?");
+			throw new RuntimeException("Runtime.availableProcessors() did not give a valid answer!");
+		}
+		return sobel(img, nCores);
+	}
+	
+	public PImage sobel(final PImage img, int nOfThreads) {
+		Thread[] threads = new Thread[nOfThreads];
+		
+		final PImage res = createImage(img.width, img.height, RGB);
+		
+		int totalPixels = img.width*img.height;
+		int threadStep  = totalPixels/nOfThreads;
+		
+		for(int i=0; i<nOfThreads; i++) {
+			final int tFrom = i*threadStep;
+			final int tTo = (i+1)*threadStep;
+			
+			threads[i] = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					sobelOn(img, res, tFrom, tTo);
+				}
+			});
+		}
+		
+		for(int i=0; i<nOfThreads; i++) {
+			threads[i].start();
+		}
+		
+		for(int i=0; i<nOfThreads; i++) {
+			try {
+				threads[i].join();
+			} catch(InterruptedException e) {
+				System.out.println("Could not join all Threads in sobel... Did the system kill one?");
+			}
+		}
+		
+		return res;
+	}
+
+	public PImage sobelOn(PImage img, PImage res, int from, int to) {
+		float[][] hKernel = {
+				{ 0,  1, 0 },
+				{ 0,  0, 0 },
+				{ 0, -1, 0 }
+			};
+		float[][] vKernel = {
+				{ 0, 0,  0 },
+				{ 1, 0, -1 },
+				{ 0, 0,  0 }
+			};
+		
+		float max = 0f;
+		float[] buffer = new float[img.width * img.height];
+		
+		// Double convolution into buffer
+		for(int p=from; p<to; p++) {
+			
+			int x = p%img.width;
+			int y = p/img.width;
+			
+			if(x < 2 || x >= (img.width-2) || y < 2 || y >= (img.height-2)) {
+				buffer[p] = 0f;
+				continue;
+			}
+			
+			float sum_h = 0f;
+			float sum_v = 0f;
+			
+			for(int i=0; i<3; i++) {
+				for(int j=0; j<3; j++) {
+					float b = brightness(img.pixels[(y+j-1) * img.width + (x+i-1)]);
+					
+					sum_h += b*hKernel[i][j];
+					sum_v += b*vKernel[i][j];
+				}
+			}
+			float val = sqrt(pow(sum_h, 2) + pow(sum_v, 2));
+			if(val > max) max = val;
+			buffer[p] = val;
+		}
+		
+		// Create from buffer
+		for(int i=from; i<to; i++) {
+			if (buffer[i] > (int)(max * 0.3f)) { // 30% of the max
 				res.pixels[i] = color(255);
 			} else {
 				res.pixels[i] = color(0);
@@ -103,60 +312,7 @@ public class ImageProcessing extends PApplet {
 		
 		return res;
 	}
-
-	public PImage sobel(PImage img) {
-		float[][] hKernel = {
-				{ 0, 1, 0 },
-				{ 0, 0, 0 },
-				{ 0, -1, 0 }
-			};
-		float[][] vKernel = {
-				{ 0, 0, 0 },
-				{ 1, 0, -1 },
-				{ 0, 0, 0 }
-			};
-		
-		PImage res = createImage(img.width, img.height, ALPHA);
-		
-		// clear the image
-		for (int i = 0; i < img.width * img.height; i++) {
-			res.pixels[i] = color(0);
-		}
-		
-		float max = 0;
-		float[] buffer = new float[img.width * img.height];
-		
-		// Double convolution into buffer
-		for(int x=2; x<img.width-2; x++) {
-			for(int y=2; y<img.height-2; y++) {
-				
-				float sum_h = 0f;
-				float sum_v = 0f;
-				
-				for(int i=0; i<3; i++) {
-					for(int j=0; j<3; j++) {
-						float b = brightness(img.pixels[(y+j-1) * img.width + (x+i-1)]);
-						sum_h += b*hKernel[i][j];
-						sum_v += b*vKernel[i][j];
-					}
-				}				
-				float val = sqrt(pow(sum_h, 2) + pow(sum_v, 2));			
-				if(val > max) max = val;		
-				buffer[y*img.width + x] = val;		
-			}
-		}		
-		// Create from buffer
-		for (int y = 2; y < img.height - 2; y++) { // Skip top and bottom edges
-			for (int x = 2; x < img.width - 2; x++) { // Skip left and right
-				if (buffer[y * img.width + x] > (int)(max * 0.3f)) { // 30% of the max
-					res.pixels[y * img.width + x] = color(255);
-				} else {
-					res.pixels[y * img.width + x] = color(0);
-				}
-			}
-		}
-		return res;
-	}
+	
 	
 	
 	public void hough(PImage edgeImg){
