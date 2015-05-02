@@ -180,10 +180,12 @@ public class ImageProcessing extends PApplet {
 				if(brightness(edgeImg.pixels[y*edgeImg.width+x])!=0){
 					//...determine all the lines (r,phi) passing through
 					// pixel(x,y), convert(r, phi) to coordinates in accumulator, increment accumulator;
+					int i = 0;
 					for(float phi = 0; phi<Math.PI; phi+=discretizationStepPhi){
 						float r = (x)*cos(phi)+(y)*sin(phi);
 						if(r<0) r += (rDim - 1) / 2;
-						accumulator[(int)(phi*rMax+floor(r))] ++;
+						accumulator[(int)(i*rMax+floor(r))] ++;
+						i++;
 						}
 					
 					}
@@ -196,6 +198,8 @@ public class ImageProcessing extends PApplet {
 		}
 		
 		houghImg.updatePixels();
+		
+		houghImg.save("resources/boards/Accumulator.png");
 	/////plotting the lines
 			for(int idx = 0; idx<accumulator.length;idx++){
 				if(accumulator[idx]>200){
@@ -204,6 +208,11 @@ public class ImageProcessing extends PApplet {
 					float r = (accR - (rDim-1)*0.5f)*discretizationStepR;
 					float phi = accPhi*discretizationStepPhi;
 					
+					// !!!!!!	A FIXER !!!!!!!
+					r = idx%rMax;
+					phi = idx/rMax;
+					
+				
 					//Cartesian equation of a line : y = ax+b
 					// in polar : y = (-cos(phi)/sin(phi))x+(r/sin(phi)
 					// => y = 0 : x = r/cos(phi)
