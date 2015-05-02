@@ -14,14 +14,21 @@ public class ImageProcessing extends PApplet {
 
 	@Override
 	public void setup() {
-		image = loadImage("resources/boards/board4.jpg");
-		size(image.width, image.height);
+		image = loadImage("resources/boards/board1.jpg");
+		System.out.println("Largeur : "+image.width + ", Hauteur : "+image.height);
+		size(image.width, image.height);	
+		result = sobel(hsbFilter(gaussianBlur(image)));
+		image(result, 0, 0);
+		hough(result);
+		
 	}
 
 	@Override
 	public void draw() {
-		result = sobel(hsbFilter(gaussianBlur(image)));
+		/*result = sobel(hsbFilter(gaussianBlur(image)));
 		image(result, 0, 0);
+		hough(result);
+		*/
 	}
 
 	
@@ -132,17 +139,12 @@ public class ImageProcessing extends PApplet {
 						sum_h += b*hKernel[i][j];
 						sum_v += b*vKernel[i][j];
 					}
-				}
-				
-				float val = sqrt(pow(sum_h, 2) + pow(sum_v, 2));
-				
-				if(val > max) max = val;
-				
-				buffer[y*img.width + x] = val;
-				
+				}				
+				float val = sqrt(pow(sum_h, 2) + pow(sum_v, 2));			
+				if(val > max) max = val;		
+				buffer[y*img.width + x] = val;		
 			}
-		}
-		
+		}		
 		// Create from buffer
 		for (int y = 2; y < img.height - 2; y++) { // Skip top and bottom edges
 			for (int x = 2; x < img.width - 2; x++) { // Skip left and right
@@ -154,6 +156,117 @@ public class ImageProcessing extends PApplet {
 			}
 		}
 		return res;
+	}
 	
+	
+	public void hough(PImage edgeImg){
+		float discretizationStepPhi = 0.006f;
+		float discretizationStepR = 2.5f;
+		
+		
+		//dimensions of the accumulator
+		int phiDim = (int)(Math.PI/discretizationStepPhi);
+		int rDim = (int)(((edgeImg.width+edgeImg.height)*2+1)/discretizationStepR);
+		
+		//accumulator with a 1pix margin around
+		int[] accumulator = new int[(phiDim+2)*(rDim+2)];
+		int rMax = rDim+2;
+		
+		//Fill the accumulator: on edge point (white pixel of the edgeImg), store all possible (r,phi) pair discribing 
+		//lines going through this point
+		for(int y = 0; y<edgeImg.height;y++){
+			for(int x = 0; x<edgeImg.width;x++){
+				//are we on edge?
+				if(brightness(edgeImg.pixels[y*edgeImg.width+x])!=0){
+					//...determine all the lines (r,phi) passing through
+					// pixel(x,y), convert(r, phi) to coordinates in accumulator, increment accumulator;
+					for(float phi = 0; phi<Math.PI; phi+=discretizationStepPhi){
+						float r = (x)*cos(phi)+(y)*sin(phi);
+						if(r<0) r += (rDim - 1) / 2;
+						accumulator[(int)(phi*rMax+floor(r))] ++;
+						}
+					
+					}
+				}
+					
+			}	
+		PImage houghImg = createImage(rDim+2,phiDim+2, ALPHA);
+		for(int i = 0; i<accumulator.length;i++){
+			houghImg.pixels[i] = color(min(255,accumulator[i]));
+		}
+		
+		houghImg.updatePixels();
+	/////plotting the lines
+			for(int idx = 0; idx<accumulator.length;idx++){
+				if(accumulator[idx]>200){
+					int accPhi = (int)(idx/(rDim+2))-1;
+					int accR = idx - (accPhi+1)*(rDim+2)-1;
+					float r = (accR - (rDim-1)*0.5f)*discretizationStepR;
+					float phi = accPhi*discretizationStepPhi;
+					
+					//Cartesian equation of a line : y = ax+b
+					// in polar : y = (-cos(phi)/sin(phi))x+(r/sin(phi)
+					// => y = 0 : x = r/cos(phi)
+					// => x = 0 : y = r/sin(phi)
+					
+					//compute the intersection of this  line with the 4 borders of the image
+					
+					int x0 = 0;
+					int y0 = (int)(r/sin(phi));
+					int x1 = (int)(r/cos(phi));
+					int y1 = 0;
+					int x2 = edgeImg.width;
+					int y2 = (int)(-cos(phi)/sin(phi) * x2+r/sin(phi));
+					int y3 = edgeImg.height;
+					int x3 = (int)(-(y3-r/sin(phi))*(sin(phi)/cos(phi)));
+			
+					int px = (int) (r*cos(phi));
+					int py = (int) (r*sin(phi));
+					
+					stroke(56,54,170);
+					noFill();
+					ellipse(px,py,25,25);
+				/*	System.out.println("========NOUVEAU POINT LUMINEUX========");
+					System.out.println("Phi : "+phi);
+					System.out.println("R : "+r);
+					
+					System.out.println("(x0,y0,x1,y1,x2,y2,x3,y3) = ("
+					+x0+","+y0+","+x1+","+y1+","+x2+","+y2+","+x3+","+y3+")");
+					
+					System.out.println(" ");
+				*/
+				//Finally, plot the lines
+					stroke(204,102,0);
+					//noStroke();
+					if(y0>0){
+						if(x1>0){
+							System.out.println("Selected = 1");
+							line(x0,y0,x1,y1);
+						}
+						else if(y2>0) {
+							System.out.println("Selected = 2");
+							 line(x0,y0,x2,y2);
+						}
+						else {
+							System.out.println("Selected = 3");
+							line(x0,y0,x3,y3);
+						}
+					}else{
+						if(x1>0){
+							if(y2>0){
+								System.out.println("Selected = 4");
+								line(x1,y1,x2,y2);
+							}
+							else {
+								System.out.println("Selected =5");
+								line(x1,y1,x3,y3);
+							}
+						}else{
+							System.out.println("Selected = 6");
+							line(x2,y2,x3,y3);
+						}
+					}
+				}
+			}
 	}
 }

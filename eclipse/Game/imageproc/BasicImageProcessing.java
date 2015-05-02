@@ -208,7 +208,7 @@ public class BasicImageProcessing extends PApplet {
 					int i = 0;
 					for(float phi = 0; phi<Math.PI; phi+=discretizationStepPhi){
 						float r = x*cos(phi)+y*sin(phi);
-						accumulator[floor(r)] ++;
+						accumulator[i*rMax+floor(r)] ++;
 						i++;
 					}
 					
