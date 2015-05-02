@@ -2,6 +2,7 @@ package imageproc;
 
 import processing.core.PApplet;
 import processing.core.PImage;
+import processing.video.Capture;
 
 public class ImageProcessing extends PApplet {
 	/**
@@ -11,24 +12,56 @@ public class ImageProcessing extends PApplet {
 	
 	private PImage image;
 	private PImage result;
+	private Capture cam;
+	
 
 	@Override
 	public void setup() {
-		image = loadImage("resources/boards/board1.jpg");
-		System.out.println("Largeur : "+image.width + ", Hauteur : "+image.height);
-		size(image.width, image.height);	
-		result = sobel(hsbFilter(gaussianBlur(image)));
-		image(result, 0, 0);
-		hough(result);
-		
+		size(640,480);
+		camStart();
+		if(cam.available()==true){
+			cam.read();
+		}
+		image = cam.get();
+		//size(image.width, image.height);
 	}
 
 	@Override
-	public void draw() {
-		/*result = sobel(hsbFilter(gaussianBlur(image)));
-		image(result, 0, 0);
+	public void draw(){
+		if(cam.available()==true){
+			cam.read();
+		}
+		image = cam.get();
+		result = sobel(hsbFilter(gaussianBlur(image)));
+		image(result,0,0);
 		hough(result);
-		*/
+	}
+	
+	public boolean camStart(){
+		String[] cameras = Capture.list();
+		if(cameras.length == 0){
+			println("There are no camera available for capture.");
+			image = loadImage("resources/boards/board1.jpg");
+			exit();
+			return true;
+		}else{
+			println("Available cameras :");
+			for(int i =0 ; i<cameras.length;i++){
+				println(i+". "+cameras[i]);
+			}
+			if(cameras.length>26){
+				cam = new Capture(this,cameras[1]);
+				println("Selected : "+cameras[1]);
+			} else {
+				cam = new Capture(this,cameras[0]);
+			}
+			cam.start();
+			if(cam.available()==true){
+				cam.read();
+			}
+			image = cam.get();
+			return true;
+		}
 	}
 
 	
@@ -60,9 +93,9 @@ public class ImageProcessing extends PApplet {
 					int x1 = clamp(x+k1-1, 0, img.width-1);
 					int y1 = clamp(y+k2-1, 0, img.height-1);
 
-					r += gaussianKernel[k1][k2] * red(img.pixels[y1*width + x1]);
-					g += gaussianKernel[k1][k2] * green(img.pixels[y1*width + x1]);
-					b += gaussianKernel[k1][k2] * blue(img.pixels[y1*width + x1]);
+					r += gaussianKernel[k1][k2] * red(img.pixels[y1*img.width + x1]);
+					g += gaussianKernel[k1][k2] * green(img.pixels[y1*img.width + x1]);
+					b += gaussianKernel[k1][k2] * blue(img.pixels[y1*img.width + x1]);
 				}
 			}
 
