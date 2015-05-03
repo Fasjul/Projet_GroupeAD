@@ -19,7 +19,7 @@ public class ImageProcessing extends PApplet {
 	@Override
 	public void setup() {
 	//	size(640,480);
-		image = loadImage("resources/boards/board2.jpg");
+		image = loadImage("resources/boards/board1.jpg");
 		/*camStart();
 		if(cam.available()==true){
 			cam.read();
@@ -72,7 +72,8 @@ public class ImageProcessing extends PApplet {
 	// ALL
 		// ALL sequential
 		start = System.currentTimeMillis();
-		sobel(hsbFilter(gaussianBlur(image, 1)), 1);
+		//sobel(hsbFilter(gaussianBlur(image, 1)), 1);
+		sobel(hsbFilter(image), 1);
 		stop = System.currentTimeMillis();
 				
 		System.out.println("Sequential all took " + (stop-start) + "ms");
@@ -107,7 +108,7 @@ public class ImageProcessing extends PApplet {
 		hough(result);
 	}
 	private void drawPic(){
-		image = loadImage("resources/boards/board4.jpg");
+		image = loadImage("resources/boards/board1.jpg");
 		result = applyAll(image);
 		image(image,0,0);
 		hough(result);
@@ -382,15 +383,23 @@ public class ImageProcessing extends PApplet {
 					if(brightness(edgeImg.pixels[y*edgeImg.width+x])!=0){
 						//...determine all the lines (r,phi) passing through
 						// pixel(x,y), convert(r, phi) to coordinates in accumulator, increment accumulator;
-						int i = 0;
 						for(float phi = 0; phi<Math.PI; phi+=discretizationStepPhi){
 							float r = (x)*cos(phi)+(y)*sin(phi);
+							
+							
+							float accPhi = phi/discretizationStepPhi;
+							float idx = (accPhi+1)*(rDim+2);
+							float accR = r/discretizationStepR + (rDim-1)*0.5f;
+							idx = accR+(accPhi+1)*(rDim+2);
+							
+							
+							
+							
 							
 							int index = (int)(r/discretizationStepR + (rDim-1)*0.5 + ((phi/discretizationStepPhi)+1)*(rDim+2)+1);
 							int index2 = (int)(1+phi/discretizationStepPhi)*(rDim+2);
 							
-							accumulator[(int)(index)] ++;
-							i++;
+							accumulator[(int)(idx)+1] ++;
 							}
 						
 						}
@@ -402,7 +411,7 @@ public class ImageProcessing extends PApplet {
 				houghImg.pixels[i] = color(min(255,accumulator[i]));
 			}
 			houghImg.updatePixels();
-			houghImg.save("resources/boards/Accumulator.png");
+			//houghImg.save("resources/boards/Accumulator.png");
 	/////plotting the lines
 			for(int idx = 0; idx<accumulator.length;idx++){
 				if(accumulator[idx]>200){
