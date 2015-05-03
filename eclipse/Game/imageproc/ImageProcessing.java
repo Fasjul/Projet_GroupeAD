@@ -18,15 +18,14 @@ public class ImageProcessing extends PApplet {
 
 	@Override
 	public void setup() {
-	//	size(640,480);
 		image = loadImage("resources/boards/board1.jpg");
-		/*camStart();
+		camStart();
 		if(cam.available()==true){
 			cam.read();
 		}
 		image = cam.get();
-		*/
-		size(image.width, image.height);
+		size(640,480);
+		//size(image.width, image.height);
 	}
 	
 	public void test() {
@@ -72,8 +71,8 @@ public class ImageProcessing extends PApplet {
 	// ALL
 		// ALL sequential
 		start = System.currentTimeMillis();
-		//sobel(hsbFilter(gaussianBlur(image, 1)), 1);
-		sobel(hsbFilter(image), 1);
+		sobel(hsbFilter(gaussianBlur(image, 1)), 1);
+		
 		stop = System.currentTimeMillis();
 				
 		System.out.println("Sequential all took " + (stop-start) + "ms");
@@ -95,8 +94,8 @@ public class ImageProcessing extends PApplet {
 	
 	@Override
 	public void draw(){
-		//drawCam();
-		drawPic();
+		drawCam();
+		//drawPic();
 	}
 	private void drawCam(){
 		if(cam.available()==true){
@@ -109,7 +108,7 @@ public class ImageProcessing extends PApplet {
 	}
 	private void drawPic(){
 		image = loadImage("resources/boards/board1.jpg");
-		result = applyAll(image);
+		result = sobel(hsbFilter(gaussianBlur(image, 1)), 1);
 		image(image,0,0);
 		hough(result);
 	}
@@ -413,6 +412,7 @@ public class ImageProcessing extends PApplet {
 			houghImg.updatePixels();
 			//houghImg.save("resources/boards/Accumulator.png");
 	/////plotting the lines
+			
 			for(int idx = 0; idx<accumulator.length;idx++){
 				if(accumulator[idx]>200){
 					int accPhi = (int)(idx/(rDim+2))-1;
