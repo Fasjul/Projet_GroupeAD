@@ -1,5 +1,7 @@
 package imageproc;
 
+import java.util.ArrayList;
+
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.video.Capture;
@@ -18,14 +20,14 @@ public class ImageProcessing extends PApplet {
 
 	@Override
 	public void setup() {
-		image = loadImage("resources/boards/board1.jpg");
-		camStart();
+		image = loadImage("resources/boards/board2.jpg");
+		/*camStart();
 		if(cam.available()==true){
 			cam.read();
 		}
 		image = cam.get();
-		size(640,480);
-		//size(image.width, image.height);
+		//size(640,480);*/
+		size(image.width, image.height);
 	}
 	
 	public void test() {
@@ -94,8 +96,8 @@ public class ImageProcessing extends PApplet {
 	
 	@Override
 	public void draw(){
-		drawCam();
-		//drawPic();
+		//drawCam();
+		drawPic();
 	}
 	private void drawCam(){
 		if(cam.available()==true){
@@ -103,13 +105,13 @@ public class ImageProcessing extends PApplet {
 		}
 		image = cam.get();
 		result = sobel(hsbFilter(gaussianBlur(image)));
-		image(result,0,0);
+		image(image,0,0);
 		hough(result);
 	}
 	private void drawPic(){
-		image = loadImage("resources/boards/board1.jpg");
+		image = loadImage("resources/boards/board5.jpg");
 		result = sobel(hsbFilter(gaussianBlur(image, 1)), 1);
-		image(image,0,0);
+		image(result,0,0);
 		hough(result);
 	}
 	
@@ -374,6 +376,7 @@ public class ImageProcessing extends PApplet {
 			int[] accumulator = new int[(phiDim+2)*(rDim+2)];
 			int rMax = rDim+2;
 			
+			System.out.println(edgeImg.height);
 			//Fill the accumulator: on edge point (white pixel of the edgeImg), store all possible (r,phi) pair discribing 
 			//lines going through this point
 			for(int y = 0; y<edgeImg.height;y++){
@@ -389,16 +392,10 @@ public class ImageProcessing extends PApplet {
 							float accPhi = phi/discretizationStepPhi;
 							float idx = (accPhi+1)*(rDim+2);
 							float accR = r/discretizationStepR + (rDim-1)*0.5f;
-							idx = accR+(accPhi+1)*(rDim+2);
+							idx = accR+(accPhi+1)*(rDim+2)+1;
 							
 							
-							
-							
-							
-							int index = (int)(r/discretizationStepR + (rDim-1)*0.5 + ((phi/discretizationStepPhi)+1)*(rDim+2)+1);
-							int index2 = (int)(1+phi/discretizationStepPhi)*(rDim+2);
-							
-							accumulator[(int)(idx)+1] ++;
+							accumulator[Math.round(idx)] ++;
 							}
 						
 						}
@@ -411,16 +408,16 @@ public class ImageProcessing extends PApplet {
 			}
 			houghImg.updatePixels();
 			//houghImg.save("resources/boards/Accumulator.png");
-	/////plotting the lines
 			
+			ArrayList<Integer> bestCandidate = new ArrayList<Integer>();
+	/////plotting the lines
+		
 			for(int idx = 0; idx<accumulator.length;idx++){
-				if(accumulator[idx]>200){
+				if(accumulator[idx]>325){
 					int accPhi = (int)(idx/(rDim+2))-1;
 					int accR = idx - (accPhi+1)*(rDim+2)-1;
 					float r = (accR - (rDim-1)*0.5f)*discretizationStepR;
 					float phi = accPhi*discretizationStepPhi;
-					
-					
 				
 					//Cartesian equation of a line : y = ax+b
 					// in polar : y = (-cos(phi)/sin(phi))x+(r/sin(phi)
@@ -437,9 +434,7 @@ public class ImageProcessing extends PApplet {
 					int y2 = (int)(-cos(phi)/sin(phi) * x2+r/sin(phi));
 					int y3 = edgeImg.height;
 					int x3 = (int)(-(y3-r/sin(phi))*(sin(phi)/cos(phi)));
-			
-					int px = (int)(r*cos(phi));
-					int py = (int)(r*sin(phi));
+		
 				//Finally, plot the lines
 					stroke(204,102,0);
 					//noStroke();
@@ -448,7 +443,7 @@ public class ImageProcessing extends PApplet {
 							line(x0,y0,x1,y1);
 						}
 						else if(y2>0) {
-							 line(x0*cos(phi),y0*sin(phi),x2*cos(phi),y2*sin(phi));
+							 line(x0,y0,x2,y2);
 						}
 						else {
 							line(x0,y0,x3,y3);
