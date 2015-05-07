@@ -20,17 +20,37 @@ public class ImageProcessing extends PApplet {
 	private Capture cam;
 	float discretizationStepPhi = 0.006f;
 	float discretizationStepR = 2.5f;
+	boolean cameraBool = false;
+	private int phiDim = (int)(Math.PI/discretizationStepPhi);
+	private float[] tabSin = new float[phiDim];
+	private float[] tabCos = new float[phiDim];
 
 	@Override
 	public void setup() {
-		image = loadImage("resources/boards/board2.jpg");
-		camStart();
-		if(cam.available()==true){
-			cam.read();
-		}
-		image = cam.get();
-		size(640,480);
-		//size(image.width, image.height);
+			image = loadImage("resources/boards/board2.jpg");
+			//size(image.width, image.height);
+		
+			camStart();
+			if(cam.available()==true){
+				cam.read();
+			}
+			image = cam.get();
+			size(640,480);
+			
+			
+			//TODO OPTIMISATION (step 4 week 10) -> A Placer hors de la fonction, par exemple au setup, afin d'éviter de devoir recalculer
+				tabSin = new float[phiDim];
+				tabCos = new float[phiDim];
+				
+				float ang = 0;
+				float inverseR = 1.f/discretizationStepR;
+				
+				for(int accPhi = 0; accPhi <phiDim ; ang+=discretizationStepPhi, accPhi ++){
+					tabSin[accPhi] = (float)(Math.sin(ang)*inverseR);
+					tabCos[accPhi] = (float)(Math.cos(ang)*inverseR);
+				}
+				
+		
 	}
 	
 	public void test() {
@@ -109,13 +129,13 @@ public class ImageProcessing extends PApplet {
 		image = cam.get();
 		result = sobel(hsbFilter(gaussianBlur(image)));
 		image(image,0,0);
-		hough(result,4);
+		hough(result,4,tabCos,tabSin);
 	}
 	private void drawPic(){
 		image = loadImage("resources/boards/board1.jpg");
 		result = sobel(hsbFilter(gaussianBlur(image, 1)), 1);
 		image(result,0,0);
-		hough(result,4);
+		hough(result,4,tabCos,tabSin);
 	}
 	
 	public boolean camStart(){
@@ -365,24 +385,15 @@ public class ImageProcessing extends PApplet {
 		return res;
 	}
 	
-	public ArrayList<PVector> hough(PImage edgeImg, int nLines){
+	public ArrayList<PVector> hough(PImage edgeImg, int nLines, float[] tabCos, float[] tabSin){
 
-		//dimensions of the accumulator
-		int phiDim = (int)(Math.PI/discretizationStepPhi);
 		int rDim = (int)(((edgeImg.width+edgeImg.height)*2+1)/discretizationStepR);
-		
-		//TODO OPTIMISATION (step 4 week 10)
-			float[] tabSin = new float[phiDim];
-			float[] tabCos = new float[phiDim];
-			
-			float ang = 0;
-			float inverseR = 1.f/discretizationStepR;
-			
+		//dimensions of the accumulator
 		////
 		
-			
 			//accumulator with a 1pix margin around
 			int[] accumulator = new int[(phiDim+2)*(rDim+2)];
+			
 
 			//Fill the accumulator: on edge point (white pixel of the edgeImg), store all possible (r,phi) pair discribing 
 			//lines going through this point
@@ -393,19 +404,24 @@ public class ImageProcessing extends PApplet {
 						
 						//...determine all the lines (r,phi) passing through
 						// pixel(x,y), convert(r, phi) to coordinates in accumulator, increment accumulator;
-						for(float phi = 0; phi<Math.PI; phi+=discretizationStepPhi){
-							
-							float r = (x)*cos(phi)+(y)*sin(phi);
-							float accPhi = phi/discretizationStepPhi;
+						
+							for(int accPhi = 0; accPhi<phiDim; accPhi++){
+						
+							float r = (x)*tabCos[accPhi]+(y)*tabSin[accPhi];
 							float idx = (accPhi+1)*(rDim+2);
 							float accR = r/discretizationStepR + (rDim-1)*0.5f;
 							idx = accR+(accPhi+1)*(rDim+2)+1;
 									
 							accumulator[Math.round(idx)] ++;
+						
 							}
 						}
 					}		
 				}	
+			
+			
+			
+			
 			PImage houghImg = createImage(rDim+2,phiDim+2, ALPHA);
 			for(int i = 0; i<accumulator.length;i++){
 				houghImg.pixels[i] = color(min(255,accumulator[i]));
@@ -470,18 +486,18 @@ public class ImageProcessing extends PApplet {
 				int accPhi = (int)(idx/(rDim+2))-1;
 				int accR = idx - (accPhi+1)*(rDim+2)-1;
 				float r = (accR - (rDim-1)*0.5f)*discretizationStepR;	 					
-				float phi = accPhi*discretizationStepPhi;
+				//float phi = accPhi*discretizationStepPhi;
 				
-				vectors.add(new PVector(r,phi));
+				vectors.add(new PVector(r,accPhi));
 				
 				int x0 = 0;
-				int y0 = (int)(r/sin(phi));
-				int x1 = (int)(r/cos(phi));
+				int y0 = (int)(r/tabSin[accPhi]);
+				int x1 = (int)(r/tabCos[accPhi]);
 				int y1 = 0;
 				int x2 = edgeImg.width;
-				int y2 = (int)(-cos(phi)/sin(phi) * x2+r/sin(phi));
+				int y2 = (int)(-tabCos[accPhi]/tabSin[accPhi] * x2+r/tabSin[accPhi]);
 				int y3 = edgeImg.height;
-				int x3 = (int)(-(y3-r/sin(phi))*(sin(phi)/cos(phi)));
+				int x3 = (int)(-(y3-r/tabSin[accPhi])*(tabSin[accPhi]/tabCos[accPhi]));
 				
 				//Finally, plot the lines
 				stroke(204,102,0);
@@ -507,7 +523,7 @@ public class ImageProcessing extends PApplet {
 			}
 		}
 		//and plot intersections
-		ArrayList<PVector> intersections = getIntersections(vectors);
+		ArrayList<PVector> intersections = getIntersections(vectors,tabCos,tabSin);
 		for(int i = 0; i<intersections.size();i++){
 			PVector v = intersections.get(i);
 			fill(255,128,0);
@@ -516,7 +532,7 @@ public class ImageProcessing extends PApplet {
 	return vectors;
 	}
 
-	private ArrayList<PVector> getIntersections(List<PVector> lines){
+	private ArrayList<PVector> getIntersections(List<PVector> lines, float[] tabCos, float[] tabSin){
 		ArrayList<PVector> intersections = new ArrayList<PVector>();
 		
 		for(int i = 0; i<lines.size() -1; i++){
@@ -525,13 +541,14 @@ public class ImageProcessing extends PApplet {
 			for(int j = i+1;j<lines.size();j++){
 				PVector line2 = lines.get(j);
 				
-			float d = cos(line2.y)*sin(line1.y) - cos(line1.y)*sin(line2.y);
-			float x = (line2.x*sin(line1.y)-line1.x*sin(line2.y))/d;
-			float y = (-line2.x*cos(line1.y)+line1.x*cos(line2.y))/d;
+			float d = tabCos[(int)line2.y]*tabSin[(int)line1.y]- tabCos[(int)line1.y]*tabSin[(int)line2.y];
+			float x = (line2.x*tabSin[(int)line1.y]-line1.x*tabSin[(int)line2.y])/d;
+			float y = (-line2.x*tabCos[(int)line1.y]+line1.x*tabCos[(int)line2.y])/d;
 			
 			intersections.add(new PVector(x,y));
 			}
 		}
+		
 		return intersections;
 	}
 }
