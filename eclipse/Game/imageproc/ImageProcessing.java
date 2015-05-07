@@ -23,8 +23,7 @@ public class ImageProcessing extends PApplet {
 	 */
 	private static final long serialVersionUID = 1634966782356685343L;
 	
-	private PImage image;
-	private PImage result;
+	private PImage camera,sobel,image,accuImg;
 	private Capture cam;
 	float discretizationStepPhi = 0.006f;
 	float discretizationStepR = 2.5f;
@@ -43,7 +42,7 @@ public class ImageProcessing extends PApplet {
 				cam.read();
 			}
 			image = cam.get();
-			size(640,480);
+			size(1200,480);
 			tabInitialization();
 	}
 	
@@ -104,11 +103,10 @@ public class ImageProcessing extends PApplet {
 		System.out.println("\"Parallel\" all took " + (stop-start) + "ms");
 		
 	// Draw
-		result = applyAll(image);
-		image(result, 0, 0);
+		sobel = applyAll(image);
+		image(sobel, 0, 0);
 		
 	}
-	
 	
 	
 	@Override
@@ -120,16 +118,22 @@ public class ImageProcessing extends PApplet {
 		if(cam.available()==true){
 			cam.read();
 		}
-		image = cam.get();
-		result = sobel(hsbFilter(gaussianBlur(image)));
-		image(image,0,0);
-		hough(result,4,tabCos,tabSin);
+		camera = cam.get();
+		sobel = sobel(hsbFilter(gaussianBlur(camera,1)),1);
+		image(camera,0,0);
+		hough(sobel,4,tabCos,tabSin);
+		accuImg = loadImage("resources/boards/Accumulator.png");
+		image(accuImg,0,camera.height);
+		image(sobel,camera.width,0);
 	}
 	private void drawPic(){
 		image = loadImage("resources/boards/board1.jpg");
-		result = sobel(hsbFilter(gaussianBlur(image, 1)), 1);
-		image(result,0,0);
-		hough(result,4,tabCos,tabSin);
+		sobel = sobel(hsbFilter(gaussianBlur(image,1)),1);
+		image(image,0,0);
+		hough(sobel,4,tabCos,tabSin);
+		accuImg = loadImage("resources/boards/Accumulator.png");
+		image(accuImg,0,image.height);
+		image(sobel,image.width,0);
 	}
 	
 	public boolean camStart(){
@@ -435,7 +439,7 @@ public class ImageProcessing extends PApplet {
 				houghImg.pixels[i] = color(min(255,accumulator[i]));
 			}
 			houghImg.updatePixels();
-			//houghImg.save("resources/boards/Accumulator.png");
+			houghImg.save("resources/boards/accumulator.png");
 			
 
 			// Select the candidates
