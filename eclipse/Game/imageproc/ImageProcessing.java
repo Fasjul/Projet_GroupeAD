@@ -1,8 +1,16 @@
 package imageproc;
 
+import java.awt.Button;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -36,21 +44,7 @@ public class ImageProcessing extends PApplet {
 			}
 			image = cam.get();
 			size(640,480);
-			
-			
-			//TODO OPTIMISATION (step 4 week 10) -> A Placer hors de la fonction, par exemple au setup, afin d'éviter de devoir recalculer
-				tabSin = new float[phiDim];
-				tabCos = new float[phiDim];
-				
-				float ang = 0;
-				float inverseR = 1.f/discretizationStepR;
-				
-				for(int accPhi = 0; accPhi <phiDim ; ang+=discretizationStepPhi, accPhi ++){
-					tabSin[accPhi] = (float)(Math.sin(ang)*inverseR);
-					tabCos[accPhi] = (float)(Math.cos(ang)*inverseR);
-				}
-				
-		
+			tabInitialization();
 	}
 	
 	public void test() {
@@ -163,6 +157,20 @@ public class ImageProcessing extends PApplet {
 			image = cam.get();
 			return true;
 		}
+	}
+
+	public void tabInitialization(){
+		//TODO OPTIMISATION (step 4 week 10) -> A Placer hors de la fonction, par exemple au setup, afin d'éviter de devoir recalculer
+			tabSin = new float[phiDim];
+			tabCos = new float[phiDim];
+			
+			float ang = 0;
+			float inverseR = 1.f/discretizationStepR;
+			
+			for(int accPhi = 0; accPhi <phiDim ; ang+=discretizationStepPhi, accPhi ++){
+				tabSin[accPhi] = (float)(Math.sin(ang)*inverseR);
+				tabCos[accPhi] = (float)(Math.cos(ang)*inverseR);
+			}
 	}
 
 	
