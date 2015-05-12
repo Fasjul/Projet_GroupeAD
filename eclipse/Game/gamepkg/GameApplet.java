@@ -28,11 +28,11 @@ public class GameApplet extends PApplet {
 	private int mouseScroll = 0;
 
 	public void setup() {
-		size(600, 800, P2D);
+		size(600, 710, P2D);
 		noStroke();
 		
 		gameGraphics = createGraphics(600, 600, P3D);
-		statGraphics = createGraphics(600, 200, P3D);
+		statGraphics = createGraphics(600, 110, P2D);
 		
 		bX = width/2;
 		bY = height/2;
@@ -44,8 +44,8 @@ public class GameApplet extends PApplet {
 
 		final int ballRadius = 10;
 
-		final int cylinderBaseRadius = 20;
-		final int cylinderBaseHeight = 50;
+		final int cylinderBaseRadius = 30;
+		final int cylinderBaseHeight = 30;
 		final int cylinderResolution = 40;
 		
 		// TODO: Create and send Graphics variables here:
@@ -115,9 +115,9 @@ public class GameApplet extends PApplet {
 				toAdd.setColor(255, 255, 51);
 
 			} else if(mouseButton == RIGHT) {
-				for(int i = 0; i<game.obstacles.obstacleList.size(); i++) {
-					if(ghost.collisionWithCylinder(game.obstacles.obstacleList.get(i))) {
-						game.obstacles.obstacleList.remove(i);
+				for(ClosedCylinder c : game.obstacles.obstacleList) {
+					if(ghost.collisionWithCylinder(c)) {
+						game.obstacles.remove(c);
 					}
 				}
 			}
