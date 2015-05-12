@@ -20,7 +20,7 @@ public class ClosedCylinder implements Drawable {
 	
 	public final GameApplet GAME;
 	public final PGraphics GAMEGFX;
-	public final PShape CYLINDER;
+//	public final PShape CYLINDER;
 
 	/*public ClosedCylinder() {
 		this.location = new PVector(0,0);
@@ -32,7 +32,7 @@ public class ClosedCylinder implements Drawable {
 	public ClosedCylinder(GameApplet game, PGraphics gameGraphics, PVector location, float radius, float height, int resolution){
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
-		this.CYLINDER = GAMEGFX.loadShape("resources/objects/cylinder.obj");
+//		this.CYLINDER = GAMEGFX.loadShape("resources/objects/cylinder.obj");
 		
 		this.location = new PVector(location.x, location.y);
 		this.radius = radius;
@@ -80,15 +80,15 @@ public class ClosedCylinder implements Drawable {
 		return this.ghost;
 	}
 	
-	public void draw(){
+	/*public void draw(){
 		GAMEGFX.fill(GAMEGFX.color(R,G,B));
 		GAMEGFX.shape(CYLINDER);
-	}
+	}*/
 
-	/*public void draw(){
-		GAME.pushMatrix();
-		GAME.translate(location.x, -GAME.game.box.height/2, location.y);
-		GAME.rotateX(GAME.PI/2);
+	public void draw(){
+		GAMEGFX.pushMatrix();
+		GAMEGFX.translate(location.x, -GAME.game.box.height/2, location.y);
+		GAMEGFX.rotateX(PConstants.PI/2);
 
 		float angle;
 		float[] x = new float [resolution + 1];
@@ -101,39 +101,39 @@ public class ClosedCylinder implements Drawable {
 			y[i] = PApplet.cos(angle) * radius;
 		}
 
-		GAME.beginShape(PConstants.QUAD_STRIP);
+		GAMEGFX.beginShape(PConstants.QUAD_STRIP);
 		if(ghost) {
-			GAME.fill(GAME.color(255, 255, 224, 100));
+			GAMEGFX.fill(GAMEGFX.color(255, 255, 224, 100));
 		} else {
-			GAME.fill(GAME.color(R, G, B));
+			GAMEGFX.fill(GAMEGFX.color(R, G, B));
 		}
 
 		//draw the border of the cylinder
 		for(int i = 0; i<x.length; i++){
-			GAME.vertex(x[i], y[i], 0f);
-			GAME.vertex(x[i], y[i], height);
+			GAMEGFX.vertex(x[i], y[i], 0f);
+			GAMEGFX.vertex(x[i], y[i], height);
 		}
-		GAME.vertex(x[0], y[0], 0);
-		GAME.vertex(x[0], y[0], height);
+		GAMEGFX.vertex(x[0], y[0], 0);
+		GAMEGFX.vertex(x[0], y[0], height);
 
 		//top surface
 		for(int i = 0; i<x.length; i++){
-			GAME.vertex(   0,    0, height);
-			GAME.vertex(x[i], y[i], height);
+			GAMEGFX.vertex(   0,    0, height);
+			GAMEGFX.vertex(x[i], y[i], height);
 		}
-		GAME.vertex(   0,    0, height);
-		GAME.vertex(x[0], y[0], height);
+		GAMEGFX.vertex(   0,    0, height);
+		GAMEGFX.vertex(x[0], y[0], height);
 
 		//bottom surface
 		for(int i = 0; i<x.length; i++){
-			GAME.vertex(   0,    0, 0);
-			GAME.vertex(x[i], y[i], 0);
+			GAMEGFX.vertex(   0,    0, 0);
+			GAMEGFX.vertex(x[i], y[i], 0);
 		}
-		GAME.vertex(   0,    0, 0);
-		GAME.vertex(x[0], y[0], 0);
-		GAME.endShape();
+		GAMEGFX.vertex(   0,    0, 0);
+		GAMEGFX.vertex(x[0], y[0], 0);
+		GAMEGFX.endShape();
 
-		GAME.noFill();
-		GAME.popMatrix();
-	}*/
+		GAMEGFX.noFill();
+		GAMEGFX.popMatrix();
+	}
 }
