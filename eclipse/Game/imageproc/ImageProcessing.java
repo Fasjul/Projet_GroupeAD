@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -31,6 +32,7 @@ public class ImageProcessing extends PApplet {
 	private int phiDim = (int)(Math.PI/discretizationStepPhi);
 	private float[] tabSin = new float[phiDim];
 	private float[] tabCos = new float[phiDim];
+	private boolean plotLines = false;
 	
 	// The following is hard code which can't be changed during execution.
 	/**
@@ -41,15 +43,14 @@ public class ImageProcessing extends PApplet {
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
 	 */
-	private final int board = 1;
+	private final int board = 4;
 
 	@Override
 	public void setup() {
 		tabInitialization();
-		
 		if(!useCamera) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
-			size(3*(image.width-170), image.height);
+			size((image.width), image.height);
 			drawPic();
 		} else {
 			camStart();
@@ -59,12 +60,16 @@ public class ImageProcessing extends PApplet {
 			image = cam.get();
 			size(1200,480);
 		}
+		test();
 	}
 
 	@Override
 	public void draw(){
 		if(useCamera) {
 			drawCam();
+			
+		}else{
+			drawPic();
 		}
 	}
 
@@ -84,7 +89,7 @@ public class ImageProcessing extends PApplet {
 	private void drawPic(){
 		sobel = applyAll(image);
 		image(image, 0, 0);
-		hough(sobel, 4, tabCos, tabSin);
+		hough(sobel, 100, tabCos, tabSin);
 		accuImg = loadImage("resources/boards/Accumulator.png");
 		image(sobel, image.width - 170, 0);
 		image(accuImg, image.width + sobel.width - 340, 0);
@@ -379,8 +384,9 @@ public class ImageProcessing extends PApplet {
 
 		//plot
 		Collections.sort(bestCandidates,new HoughComparator(accumulator));
-		ArrayList<PVector> vectors = new ArrayList<PVector>();
-
+	//	ArrayList<PVector> accVectors = new ArrayList<PVector>();
+		ArrayList<PVector> lines = new ArrayList<PVector>();
+		
 		for(int i = 0; i<nLines;i++){
 			if(i<bestCandidates.size()){
 
@@ -389,9 +395,10 @@ public class ImageProcessing extends PApplet {
 				int accPhi = (int)(idx/(rDim+2))-1;
 				int accR = idx - (accPhi+1)*(rDim+2)-1;
 				float r = (accR - (rDim-1)*0.5f)*discretizationStepR;	 					
-				//float phi = accPhi*discretizationStepPhi;
+				float phi = accPhi*discretizationStepPhi;
 
-				vectors.add(new PVector(r,accPhi));
+				//accVectors.add(new PVector(r,accPhi));
+				lines.add(new PVector(r,phi));
 
 				int x0 = 0;
 				int y0 = (int)(r/tabSin[accPhi]);
@@ -402,6 +409,7 @@ public class ImageProcessing extends PApplet {
 				int y3 = edgeImg.height;
 				int x3 = (int)(-(y3-r/tabSin[accPhi])*(tabSin[accPhi]/tabCos[accPhi]));
 
+				if(plotLines){
 				//Finally, plot the lines
 				stroke(204,102,0);
 				if(y0>0){
@@ -422,20 +430,71 @@ public class ImageProcessing extends PApplet {
 					}else{
 						line(x2,y2,x3,y3);
 					}
+					}
 				}
 			}
 		}
-		//and plot intersections
-		ArrayList<PVector> intersections = getIntersections(vectors,tabCos,tabSin);
-		for(int i = 0; i<intersections.size();i++){
-			PVector v = intersections.get(i);
-			fill(255,128,0);
-			ellipse(v.x,v.y,10,10);
+				
+		QuadGraph quadgraph = new QuadGraph();
+		quadgraph.build(lines, edgeImg.width, edgeImg.height);
+		List<int[]> quads = quadgraph.findCycles();
+		ArrayList<PVector> selectedVertices = new ArrayList<PVector>();
+		
+		//plot the quads 
+		for(int[] quad : quads){
+			PVector l1= lines.get(quad[0]);
+			PVector l2= lines.get(quad[1]);
+			PVector l3= lines.get(quad[2]);
+			PVector l4= lines.get(quad[3]);
+			
+			//Convert for use of intersection
+			l1 = new PVector(l1.x,l1.y/discretizationStepPhi);
+			l2 = new PVector(l2.x,l2.y/discretizationStepPhi);
+			l3 = new PVector(l3.x,l3.y/discretizationStepPhi);
+			l4 = new PVector(l4.x,l4.y/discretizationStepPhi);
+			
+			PVector c12 = intersection(l1,l2,tabCos,tabSin);
+			PVector c23 = intersection(l2,l3,tabCos,tabSin);
+			PVector c34 = intersection(l3,l4,tabCos,tabSin);
+			PVector c41 = intersection(l4,l1,tabCos,tabSin);
+			//Choose a random semi-transparent color
+			Random random = new Random();
+			fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),50));
+			
+			PVector c1 = new PVector(c12.x,c12.y);
+			PVector c2 = new PVector(c23.x,c23.y);
+			PVector c3 = new PVector(c34.x,c34.y);
+			PVector c4 = new PVector(c41.x,c41.y);
+			
+			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 0) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
+				selectedVertices.clear();
+				quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+				selectedVertices.add(c1);
+				selectedVertices.add(c2);
+				selectedVertices.add(c3);
+				selectedVertices.add(c4);
+			}
+			//if none is selected, choose the last graph
+			if(selectedVertices.isEmpty()){
+				selectedVertices.add(c1);
+				selectedVertices.add(c2);
+				selectedVertices.add(c3);
+				selectedVertices.add(c4);
+			}
 		}
-		return vectors;
+		//and plot intersections
+				//ArrayList<PVector> intersections = getIntersections(accVectors,tabCos,tabSin);
+				
+				for(int i = 0; i<selectedVertices.size();i++){
+					PVector v = selectedVertices.get(i);
+					fill(255,128,0);
+					ellipse(v.x,v.y,10,10);
+				}
+		
+		return selectedVertices;
 	}
 
-	private ArrayList<PVector> getIntersections(List<PVector> lines, float[] tabCos, float[] tabSin){
+	/*private ArrayList<PVector> getIntersections(List<PVector> lines, float[] tabCos, float[] tabSin){
 		ArrayList<PVector> intersections = new ArrayList<PVector>();
 
 		for(int i = 0; i<lines.size() -1; i++){
@@ -454,7 +513,14 @@ public class ImageProcessing extends PApplet {
 
 		return intersections;
 	}
-
+*/
+	private PVector intersection(PVector line1, PVector line2,float[]tabCos, float[] tabSin){
+		float d = tabCos[(int)line2.y]*tabSin[(int)line1.y]- tabCos[(int)line1.y]*tabSin[(int)line2.y];
+		float x = (line2.x*tabSin[(int)line1.y]-line1.x*tabSin[(int)line2.y])/d;
+		float y = (-line2.x*tabCos[(int)line1.y]+line1.x*tabCos[(int)line2.y])/d;
+		return new PVector(x,y);
+	}
+	
 	public void test() {
 		long start, stop;
 
