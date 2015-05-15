@@ -1,17 +1,9 @@
 package imageproc;
 
-import java.awt.Button;
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -23,6 +15,8 @@ public class ImageProcessing extends PApplet {
 	 * Generated serialVersionUID.
 	 */
 	private static final long serialVersionUID = 1634966782356685343L;
+	
+	private Random random = new Random();
 
 	private PImage camera, sobel, image, accuImg;
 	private Capture cam;
@@ -39,7 +33,7 @@ public class ImageProcessing extends PApplet {
 	 * Set to true if you want to use the camera feed,
 	 * false for static image.
 	 */
-	private final boolean useCamera = false;
+	private final boolean useCamera = true;
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
 	 */
@@ -60,7 +54,6 @@ public class ImageProcessing extends PApplet {
 			image = cam.get();
 			size(1200,480);
 		}
-		test();
 	}
 
 	@Override
@@ -133,17 +126,6 @@ public class ImageProcessing extends PApplet {
 		for(int accPhi = 0; accPhi <phiDim ; ang+=discretizationStepPhi, accPhi ++){
 			tabSin[accPhi] = (float)(Math.sin(ang)*inverseR);
 			tabCos[accPhi] = (float)(Math.cos(ang)*inverseR);
-		}
-	}
-
-
-	public int clamp(int val, int min, int max) {
-		if(val < min) {
-			return min;
-		} else if(val > max) {
-			return max;
-		} else {
-			return val;
 		}
 	}
 
@@ -329,13 +311,13 @@ public class ImageProcessing extends PApplet {
 
 
 
-
-		PImage houghImg = createImage(rDim+2,phiDim+2, ALPHA);
-		for(int i = 0; i<accumulator.length;i++){
-			houghImg.pixels[i] = color(min(255, accumulator[i]));
-		}
-		houghImg.updatePixels();
-		houghImg.save("resources/boards/accumulator.png");
+//		TRES CHER EN PERFORMANCE (Ctrl+7 pour décommenter)
+//		PImage houghImg = createImage(rDim+2,phiDim+2, ALPHA);
+//		for(int i = 0; i<accumulator.length;i++){
+//			houghImg.pixels[i] = color(min(255, accumulator[i]));
+//		}
+//		houghImg.updatePixels();
+//		houghImg.save("resources/boards/accumulator.png");
 
 
 		// Select the candidates
@@ -458,8 +440,7 @@ public class ImageProcessing extends PApplet {
 			PVector c34 = intersection(l3,l4,tabCos,tabSin);
 			PVector c41 = intersection(l4,l1,tabCos,tabSin);
 			//Choose a random semi-transparent color
-			Random random = new Random();
-			fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),50));
+			fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),70));
 			
 			PVector c1 = new PVector(c12.x,c12.y);
 			PVector c2 = new PVector(c23.x,c23.y);
@@ -474,13 +455,7 @@ public class ImageProcessing extends PApplet {
 				selectedVertices.add(c3);
 				selectedVertices.add(c4);
 			}
-			//if none is selected, choose the last graph
-			if(selectedVertices.isEmpty()){
-				selectedVertices.add(c1);
-				selectedVertices.add(c2);
-				selectedVertices.add(c3);
-				selectedVertices.add(c4);
-			}
+			
 		}
 		//and plot intersections
 				//ArrayList<PVector> intersections = getIntersections(accVectors,tabCos,tabSin);
