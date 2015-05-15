@@ -74,7 +74,7 @@ public class ImageProcessing extends PApplet {
 		sobel = applyAll(camera);
 		image(camera, 0, 0);
 		hough(sobel, 4, tabCos, tabSin);
-		accuImg = loadImage("resources/boards/Accumulator.png");
+//		accuImg = loadImage("resources/boards/Accumulator.png");
 		image(accuImg, 0, camera.height);
 		image(sobel, camera.width, 0);
 	}
@@ -83,7 +83,7 @@ public class ImageProcessing extends PApplet {
 		sobel = applyAll(image);
 		image(image, 0, 0);
 		hough(sobel, 100, tabCos, tabSin);
-		accuImg = loadImage("resources/boards/Accumulator.png");
+//		accuImg = loadImage("resources/boards/Accumulator.png");
 		image(sobel, image.width - 170, 0);
 		image(accuImg, image.width + sobel.width - 340, 0);
 	}
@@ -318,6 +318,12 @@ public class ImageProcessing extends PApplet {
 //		}
 //		houghImg.updatePixels();
 //		houghImg.save("resources/boards/accumulator.png");
+		
+		accuImg = createImage(rDim+2, phiDim+2, ALPHA);
+		for(int i=0; i<accumulator.length; i++) {
+			accuImg.pixels[i] = color(min(255, accumulator[i]));
+		}
+		accuImg.updatePixels();
 
 
 		// Select the candidates
