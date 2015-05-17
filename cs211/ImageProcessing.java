@@ -65,7 +65,7 @@ public class ImageProcessing extends PApplet {
 	public void setup() {
 		tabInitialization();
 		if(!useCamera) {
-			image = loadImage("resources/boards/board" + board + ".jpg");
+			image = loadImage("./board" + board + ".jpg");
 			image.resize((int)((image.width)*scaling), (int)((image.height)*scaling));
 			size(image.width+(accuWidth/2-shiftUnderNormal)+(image.width)-shiftOnAccu, (int)((image.height)));
 			//bar1 = new HScrollbar(this, width-width/4-20, image.height+10, width/4, 20);
