@@ -9,7 +9,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 import processing.video.Capture;
-import tools.HScrollbar;
+//import tools.HScrollbar;
 
 public class ImageProcessing extends PApplet {
 	/**
