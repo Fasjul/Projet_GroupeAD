@@ -1,4 +1,4 @@
-package imageproc;
+package cs211.imageprocessing;
 import processing.core.PImage;
 import processing.core.PApplet;
 import processing.video.Capture;	

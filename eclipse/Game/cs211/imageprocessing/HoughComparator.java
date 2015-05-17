@@ -1,4 +1,4 @@
-package imageproc;
+package cs211.imageprocessing;
 
 import java.util.Comparator;
 
