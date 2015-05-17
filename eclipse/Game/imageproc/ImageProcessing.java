@@ -33,19 +33,25 @@ public class ImageProcessing extends PApplet {
 	 * Set to true if you want to use the camera feed,
 	 * false for static image.
 	 */
-	private final boolean useCamera = true;
+	private final boolean useCamera = false;
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
 	 */
 	private final int board = 4;
+	/**
+	 * The scaling factor
+	 */
+	private final float scaling = 3/4;
 
+	private boolean imageLoaded = false;
+	
 	@Override
 	public void setup() {
 		tabInitialization();
 		if(!useCamera) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
 			size((image.width), image.height);
-			drawPic();
+			//drawPic();
 		} else {
 			camStart();
 			if(cam.available()==true){
@@ -73,8 +79,8 @@ public class ImageProcessing extends PApplet {
 		camera = cam.get();
 		sobel = applyAll(camera);
 		image(camera, 0, 0);
+		//camera.resize(50, 50);
 		hough(sobel, 4, tabCos, tabSin);
-//		accuImg = loadImage("resources/boards/Accumulator.png");
 		image(accuImg, 0, camera.height);
 		image(sobel, camera.width, 0);
 	}
@@ -83,7 +89,6 @@ public class ImageProcessing extends PApplet {
 		sobel = applyAll(image);
 		image(image, 0, 0);
 		hough(sobel, 100, tabCos, tabSin);
-//		accuImg = loadImage("resources/boards/Accumulator.png");
 		image(sobel, image.width - 170, 0);
 		image(accuImg, image.width + sobel.width - 340, 0);
 	}
@@ -307,18 +312,7 @@ public class ImageProcessing extends PApplet {
 					}
 				}
 			}		
-		}	
-
-
-
-//		TRES CHER EN PERFORMANCE (Ctrl+7 pour décommenter)
-//		PImage houghImg = createImage(rDim+2,phiDim+2, ALPHA);
-//		for(int i = 0; i<accumulator.length;i++){
-//			houghImg.pixels[i] = color(min(255, accumulator[i]));
-//		}
-//		houghImg.updatePixels();
-//		houghImg.save("resources/boards/accumulator.png");
-		
+		}			
 		accuImg = createImage(rDim+2, phiDim+2, ALPHA);
 		for(int i=0; i<accumulator.length; i++) {
 			accuImg.pixels[i] = color(min(255, accumulator[i]));
@@ -475,26 +469,6 @@ public class ImageProcessing extends PApplet {
 		return selectedVertices;
 	}
 
-	/*private ArrayList<PVector> getIntersections(List<PVector> lines, float[] tabCos, float[] tabSin){
-		ArrayList<PVector> intersections = new ArrayList<PVector>();
-
-		for(int i = 0; i<lines.size() -1; i++){
-			PVector line1 = lines.get(i);
-
-			for(int j = i+1;j<lines.size();j++){
-				PVector line2 = lines.get(j);
-
-				float d = tabCos[(int)line2.y]*tabSin[(int)line1.y]- tabCos[(int)line1.y]*tabSin[(int)line2.y];
-				float x = (line2.x*tabSin[(int)line1.y]-line1.x*tabSin[(int)line2.y])/d;
-				float y = (-line2.x*tabCos[(int)line1.y]+line1.x*tabCos[(int)line2.y])/d;
-
-				intersections.add(new PVector(x,y));
-			}
-		}
-
-		return intersections;
-	}
-*/
 	private PVector intersection(PVector line1, PVector line2,float[]tabCos, float[] tabSin){
 		float d = tabCos[(int)line2.y]*tabSin[(int)line1.y]- tabCos[(int)line1.y]*tabSin[(int)line2.y];
 		float x = (line2.x*tabSin[(int)line1.y]-line1.x*tabSin[(int)line2.y])/d;
