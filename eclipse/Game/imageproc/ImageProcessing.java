@@ -9,6 +9,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 import processing.video.Capture;
+import tools.HScrollbar;
 
 public class ImageProcessing extends PApplet {
 	/**
@@ -37,21 +38,33 @@ public class ImageProcessing extends PApplet {
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
 	 */
-	private final int board = 4;
+	private final int board = 1;
 	/**
 	 * The scaling factor
 	 */
-	private final float scaling = 3/4;
+	private final float scaling = 0.75f;
 
-	private boolean imageLoaded = false;
+	/**
+	 * Init accuWidth to 300
+	 */
+	private int accuWidth = 842;
+	private boolean initialized = false;
+	private final int shiftUnderNormal = 0;
+	private final int shiftOnAccu = 200;
+	
+
+	private HScrollbar bar1;
+	private HScrollbar bar2;
 	
 	@Override
 	public void setup() {
 		tabInitialization();
 		if(!useCamera) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
-			size((image.width), image.height);
-			//drawPic();
+			image.resize((int)((image.width)*scaling), (int)((image.height)*scaling));
+			size(image.width+(accuWidth/2-shiftUnderNormal)+(image.width)-shiftOnAccu, (int)((image.height)));
+			bar1 = new HScrollbar(this, width-width/4-20, image.height+10, width/4, 20);
+			bar2 = new HScrollbar(this, width-width/4-20,image.height+40, width/4, 20);
 		} else {
 			camStart();
 			if(cam.available()==true){
@@ -65,8 +78,7 @@ public class ImageProcessing extends PApplet {
 	@Override
 	public void draw(){
 		if(useCamera) {
-			drawCam();
-			
+			drawCam();		
 		}else{
 			drawPic();
 		}
@@ -87,10 +99,21 @@ public class ImageProcessing extends PApplet {
 	
 	private void drawPic(){
 		sobel = applyAll(image);
+		if(initialized){
+		accuImg.resize(accuWidth, image.height);
+		image(accuImg, image.width/2+shiftUnderNormal, 0);
+		}
 		image(image, 0, 0);
+		image(sobel, image.width +accuWidth/2-shiftOnAccu, 0);
 		hough(sobel, 100, tabCos, tabSin);
-		image(sobel, image.width - 170, 0);
-		image(accuImg, image.width + sobel.width - 340, 0);
+		accuWidth = accuImg.width;
+		initialized = true;
+		/*
+		bar1.display();
+		bar2.display();
+		bar1.update();
+		bar2.update();
+		*/
 	}
 
 	public boolean camStart(){
@@ -121,7 +144,6 @@ public class ImageProcessing extends PApplet {
 	}
 
 	public void tabInitialization(){
-		//TODO OPTIMISATION (step 4 week 10) -> A Placer hors de la fonction, par exemple au setup, afin d'éviter de devoir recalculer
 		tabSin = new float[phiDim];
 		tabCos = new float[phiDim];
 
@@ -191,7 +213,7 @@ public class ImageProcessing extends PApplet {
 	public PImage hsbFilter(PImage img) {
 		float hueMin =  80f; // hue minimum
 		float hueMax = 140f; // hue maximum
-
+		
 		float bMin =  30f;  // brightness minimum
 		float bMax = 200f;  // brightness maximum
 
@@ -441,15 +463,19 @@ public class ImageProcessing extends PApplet {
 			PVector c41 = intersection(l4,l1,tabCos,tabSin);
 			//Choose a random semi-transparent color
 			fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),70));
-			
+			if(useCamera){
+				fill(color(35,15,170,140));
+			}
 			PVector c1 = new PVector(c12.x,c12.y);
 			PVector c2 = new PVector(c23.x,c23.y);
 			PVector c3 = new PVector(c34.x,c34.y);
 			PVector c4 = new PVector(c41.x,c41.y);
 			
-			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 0) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
-				selectedVertices.clear();
-				quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 8000) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
+				//selectedVertices.clear();
+				//quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+				stroke(0);
+				quad(c1.x,c1.y,c2.x,c2.y,c3.x,c3.y,c4.x,c4.y);
 				selectedVertices.add(c1);
 				selectedVertices.add(c2);
 				selectedVertices.add(c3);
@@ -457,10 +483,12 @@ public class ImageProcessing extends PApplet {
 			}
 			
 		}
+		
 		//and plot intersections
-				//ArrayList<PVector> intersections = getIntersections(accVectors,tabCos,tabSin);
-				
-				for(int i = 0; i<selectedVertices.size();i++){
+				//selectedVertices.sort(new NeighborsComparator(edgeImg,30));
+				int Lsize = selectedVertices.size();
+				if(Lsize>4) Lsize = 4;
+				for(int i = 0; i<Lsize;i++){
 					PVector v = selectedVertices.get(i);
 					fill(255,128,0);
 					ellipse(v.x,v.y,10,10);

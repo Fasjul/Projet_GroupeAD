@@ -101,7 +101,7 @@ public class HScrollbar {
 	 * @brief Draws the scrollbar in its current state
 	 */
 	public void display() {
-		parent.noStroke();
+		//parent.noStroke();
 		parent.fill(204);
 		parent.rect(xPosition, yPosition, barWidth, barHeight);
 		if (mouseOver || locked) {
