@@ -37,9 +37,9 @@ public class ImageProcessing extends PApplet {
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
 	 */
-	private final int board = 4;
+	private final int board = 1;
 	/**
-	 * The scaling factor
+	 * Scaling factor applied to board images. They are too big to be all drawn next to eachother.
 	 */
 	private final float scaling = 3/4;
 
@@ -50,7 +50,7 @@ public class ImageProcessing extends PApplet {
 		tabInitialization();
 		if(!useCamera) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
-			size((image.width), image.height);
+			size(image.width, image.height);
 			//drawPic();
 		} else {
 			camStart();
@@ -67,7 +67,7 @@ public class ImageProcessing extends PApplet {
 		if(useCamera) {
 			drawCam();
 			
-		}else{
+		} else {
 			drawPic();
 		}
 	}
@@ -121,7 +121,7 @@ public class ImageProcessing extends PApplet {
 	}
 
 	public void tabInitialization(){
-		//TODO OPTIMISATION (step 4 week 10) -> A Placer hors de la fonction, par exemple au setup, afin d'éviter de devoir recalculer
+		//DONE OPTIMISATION (step 4 week 10) -> A Placer hors de la fonction, par exemple au setup, afin d'éviter de devoir recalculer
 		tabSin = new float[phiDim];
 		tabCos = new float[phiDim];
 
@@ -137,26 +137,27 @@ public class ImageProcessing extends PApplet {
 
 
 	public PImage applyAll(PImage img) {
-		PImage inter1 = gaussianBlur(img);
-		PImage inter2 = hsbFilter(inter1);
-		PImage inter3 = sobel(inter2);
-		return inter3;
+		PImage inter1 = hsbFilter(img);
+		PImage inter2 = gaussianBlur(inter1);
+		PImage inter3 = intensityFilter(inter2);
+		PImage inter4 = sobel(inter3);
+		return inter4;
 	}
 
 
 
 	public PImage gaussianBlur(PImage img) {
 		final float[][] gaussianKernel = new float[][] { {9, 12, 9}, {12, 15, 12}, {9, 12, 9} };
-		final float s = 99f;
+		final float sum = 99f; // sum of the kernel
+		
 		final int border = 2;
-
-		PImage result = createImage(img.width, img.height, RGB);
-
 		final int width = img.width;
 		final int height = img.height;
-		final int nPixels = width*height;
+		final int totPixels = width*height;
 
-		for(int i=0; i<nPixels; i++) {
+		PImage result = createImage(width, height, RGB);
+
+		for(int i=0; i<totPixels; i++) {
 			int x = i % width;
 			int y = i / width;
 
@@ -180,7 +181,7 @@ public class ImageProcessing extends PApplet {
 				}
 			}
 
-			result.pixels[i] = color(r/s, g/s, b/s);
+			result.pixels[i] = color(r/sum, g/sum, b/sum);
 		}
 
 		return result;
@@ -192,27 +193,56 @@ public class ImageProcessing extends PApplet {
 		float hueMin =  80f; // hue minimum
 		float hueMax = 140f; // hue maximum
 
-		float bMin =  30f;  // brightness minimum
-		float bMax = 200f;  // brightness maximum
+		float bMin =  20f;  // brightness minimum
+		float bMax = 240f;  // brightness maximum
 
-		float sMin = 80f;  // saturation minimum
+		float sMin = 60f;  // saturation minimum
+		
+		final int width = img.width;
+		final int height = img.height;
+		
+		final int totPixels = width*height;
 
-		PImage result = createImage(img.width, img.height, RGB);
+		PImage result = createImage(width, height, RGB);
 
-		final int nPixels = img.width*img.height;
-
-		for(int i=0; i<nPixels; i++) {
+		for(int i=0; i<totPixels; i++) {
 			int c = img.pixels[i];
+			
 			float h = hue(c);
-			float b = brightness(c);
 			float s = saturation(c);
-			if(h > hueMin && h < hueMax && b > bMin && b < bMax && s > sMin) {
-				result.pixels[i] = color(255);
+			float b = brightness(c);
+			
+			if(h >= hueMin && h < hueMax && b >= bMin && b < bMax && s >= sMin) {
+				result.pixels[i] = color(2*s); // TODO: review this
+				// does seem to work pretty well with camera feed
 			} else {
 				result.pixels[i] = color(0);
 			}
 		}
 
+		return result;
+	}
+
+	public PImage intensityFilter(PImage img) {
+		float threshold = 230;
+		
+		final int width = img.width;
+		final int height = img.height;
+		final int totPixels = img.width*img.height;
+		
+		PImage result = createImage(width, height, RGB);
+		
+		for(int i=0; i<totPixels; i++) {
+			int c = img.pixels[i];
+			float b = brightness(c);
+			
+			if(b > threshold) {
+				result.pixels[i] = color(255);
+			} else {
+				result.pixels[i] = color(0);
+			}
+		}
+		
 		return result;
 	}
 
@@ -230,15 +260,14 @@ public class ImageProcessing extends PApplet {
 
 		final int width = img.width;
 		final int height = img.height;
-		final int nPixels = width*height;
-
+		final int totPixels = width*height;
 		final int border = 2;
 
 		float max = 0f;
-		float[] buffer = new float[img.width * img.height];
+		float[] buffer = new float[width * height];
 
 		// Double convolution into buffer
-		for(int p=0; p<nPixels; p++) {
+		for(int p=0; p<totPixels; p++) {
 
 			int x = p % width;
 			int y = p / width;
@@ -269,8 +298,8 @@ public class ImageProcessing extends PApplet {
 		PImage result = createImage(width, height, RGB);
 
 		// Create from buffer
-		for(int i=0; i<nPixels; i++) {
-			if (buffer[i] > (int)(max * 0.3f)) { // 30% of the max
+		for(int i=0; i<totPixels; i++) {
+			if (buffer[i] > (max * 0.3f)) { // 30% of the max
 				result.pixels[i] = color(255);
 			} else {
 				result.pixels[i] = color(0);
