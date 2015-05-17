@@ -27,7 +27,16 @@ public class ImageProcessing extends PApplet {
 	private int phiDim = (int)(Math.PI/discretizationStepPhi);
 	private float[] tabSin = new float[phiDim];
 	private float[] tabCos = new float[phiDim];
-	private boolean plotLines = false;
+	/**
+	 * Some graphic init
+	 */
+	private int accuWidth = 842;
+	private boolean initialized = false;
+	private final int shiftUnderNormal = 0;
+	private final int shiftOnAccu = 100;
+	//HScrollbar for Hue/Brightness settings
+	//private HScrollbar bar1;
+	//private HScrollbar bar2;
 	
 	// The following is hard code which can't be changed during execution.
 	/**
@@ -35,26 +44,22 @@ public class ImageProcessing extends PApplet {
 	 * false for static image.
 	 */
 	private final boolean useCamera = false;
+	
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
 	 */
 	private final int board = 1;
+	
 	/**
 	 * The scaling factor
 	 */
 	private final float scaling = 0.75f;
-
-	/**
-	 * Init accuWidth to 300
-	 */
-	private int accuWidth = 842;
-	private boolean initialized = false;
-	private final int shiftUnderNormal = 0;
-	private final int shiftOnAccu = 200;
 	
-
-	private HScrollbar bar1;
-	private HScrollbar bar2;
+	/**
+	 * Draw options
+	 */
+	private boolean plotLines = false;
+	private boolean showQuads = true;
 	
 	@Override
 	public void setup() {
@@ -63,10 +68,8 @@ public class ImageProcessing extends PApplet {
 			image = loadImage("resources/boards/board" + board + ".jpg");
 			image.resize((int)((image.width)*scaling), (int)((image.height)*scaling));
 			size(image.width+(accuWidth/2-shiftUnderNormal)+(image.width)-shiftOnAccu, (int)((image.height)));
-			bar1 = new HScrollbar(this, width-width/4-20, image.height+10, width/4, 20);
-			bar2 = new HScrollbar(this, width-width/4-20,image.height+40, width/4, 20);
-			size(image.width, image.height);
-			//drawPic();
+			//bar1 = new HScrollbar(this, width-width/4-20, image.height+10, width/4, 20);
+			//bar2 = new HScrollbar(this, width-width/4-20,image.height+40, width/4, 20);
 		} else {
 			camStart();
 			if(cam.available()==true){
@@ -421,7 +424,6 @@ public class ImageProcessing extends PApplet {
 
 		//plot
 		Collections.sort(bestCandidates,new HoughComparator(accumulator));
-	//	ArrayList<PVector> accVectors = new ArrayList<PVector>();
 		ArrayList<PVector> lines = new ArrayList<PVector>();
 		
 		for(int i = 0; i<nLines;i++){
@@ -495,20 +497,24 @@ public class ImageProcessing extends PApplet {
 			PVector c34 = intersection(l3,l4,tabCos,tabSin);
 			PVector c41 = intersection(l4,l1,tabCos,tabSin);
 			//Choose a random semi-transparent color
-			fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),70));
-			if(useCamera){
-				fill(color(35,15,170,140));
-			}
+			
 			PVector c1 = new PVector(c12.x,c12.y);
 			PVector c2 = new PVector(c23.x,c23.y);
 			PVector c3 = new PVector(c34.x,c34.y);
 			PVector c4 = new PVector(c41.x,c41.y);
 			
 			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 8000) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
-				//selectedVertices.clear();
-				//quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
-				stroke(0);
-				quad(c1.x,c1.y,c2.x,c2.y,c3.x,c3.y,c4.x,c4.y);
+				//draw options
+				if(showQuads){
+					if(board==4){
+						fill(color(min(255,random.nextInt(300)),150,150,30));
+					}else if(useCamera){
+						fill(color(35,15,170,140));
+					}else{
+						fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),30));
+					}
+					quad(c1.x,c1.y,c2.x,c2.y,c3.x,c3.y,c4.x,c4.y);
+				}
 				selectedVertices.add(c1);
 				selectedVertices.add(c2);
 				selectedVertices.add(c3);
@@ -517,8 +523,7 @@ public class ImageProcessing extends PApplet {
 			
 		}
 		
-		//and plot intersections
-				//selectedVertices.sort(new NeighborsComparator(edgeImg,30));
+		//plot intersections
 				int Lsize = selectedVertices.size();
 				if(Lsize>4) Lsize = 4;
 				for(int i = 0; i<Lsize;i++){
