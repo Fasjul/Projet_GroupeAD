@@ -26,6 +26,7 @@ public class GameApplet extends PApplet {
 	private PGraphics statGraphics;
 	
 	static ImageProcessing imageProc;
+	private int frame = 0;
 	/**
 	 * Mouse scroll amount (between -100 and 100)
 	 */
@@ -63,6 +64,7 @@ public class GameApplet extends PApplet {
 	}
 
 	public void draw() {
+		frame++;
 		pushMatrix();
 		translate(640,0);
 		game.draw();
@@ -205,7 +207,10 @@ public class GameApplet extends PApplet {
 		} else {
 			return val;
 		}
-
+	}
+	
+	public int frame() {
+		return frame;
 	}
 
 	/**
