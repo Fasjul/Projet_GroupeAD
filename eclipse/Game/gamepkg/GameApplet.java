@@ -1,5 +1,8 @@
 package gamepkg;
 
+import java.awt.GridLayout;
+
+import imageprocessing.ImageProcessing;
 import processing.core.*;
 import processing.event.*;
 import objects.*;
@@ -22,13 +25,15 @@ public class GameApplet extends PApplet {
 	private PGraphics gameGraphics;
 	private PGraphics statGraphics;
 	
+	static ImageProcessing imageProc;
 	/**
 	 * Mouse scroll amount (between -100 and 100)
 	 */
 	private int mouseScroll = 0;
 
 	public void setup() {
-		size(600, 710, P2D);
+		
+		size(1190,710, P2D);
 		noStroke();
 		
 		gameGraphics = createGraphics(600, 600, P3D);
@@ -52,11 +57,16 @@ public class GameApplet extends PApplet {
 		Box box = new Box(gameGraphics, boxWidth, boxHeight, boxDepth);
 		Mover mover = new Mover(this, gameGraphics, ballRadius);
 		ObstacleManager obstacles = new ObstacleManager(this, gameGraphics, cylinderBaseRadius, cylinderBaseHeight, cylinderResolution);
-		game = new GameManager(this, gameGraphics, statGraphics, box, mover, obstacles);
+		
+		game = new GameManager(this, gameGraphics, statGraphics, box, mover, obstacles, imageProc);
+		
 	}
 
 	public void draw() {
+		pushMatrix();
+		translate(640,0);
 		game.draw();
+		popMatrix();
 	}
 
 	/*
@@ -222,6 +232,10 @@ public class GameApplet extends PApplet {
 	
 	public PVector getGamePos(PVector screenPos) {
 		return getGamePos((int)screenPos.x, (int)screenPos.y);
+	}
+	public boolean setImageProcessing(ImageProcessing input){
+		this.imageProc = input;
+		return true;
 	}
 	
 }

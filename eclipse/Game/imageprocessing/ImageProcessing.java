@@ -11,7 +11,7 @@ import processing.core.PVector;
 import processing.video.Capture;
 
 
-public class ImageProcessing extends PApplet {
+public class ImageProcessing extends PApplet{
 	/**
 	 * Generated serialVersionUID.
 	 */
@@ -35,6 +35,9 @@ public class ImageProcessing extends PApplet {
 	private boolean initialized = false;
 	private final int shiftUnderNormal = 0;
 	private final int shiftOnAccu = 100;
+	private PImage backWhite = new PImage(200,200);
+	private int accuHeight = 525;
+	int i =0;
 	//HScrollbar for Hue/Brightness settings
 	//private HScrollbar bar1;
 	//private HScrollbar bar2;
@@ -44,7 +47,7 @@ public class ImageProcessing extends PApplet {
 	 * Set to true if you want to use the camera feed,
 	 * false for static image.
 	 */
-	private final boolean useCamera = false;
+	private final boolean useCamera = true;
 	
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
@@ -62,6 +65,8 @@ public class ImageProcessing extends PApplet {
 	private boolean plotLines = false;
 	private boolean showQuads = true;
 	
+	public PVector boardRotations = new PVector(0,1,0);
+	
 	@Override
 	public void setup() {
 		tabInitialization();
@@ -76,9 +81,12 @@ public class ImageProcessing extends PApplet {
 			if(cam.available()==true){
 				cam.read();
 			}
+			backWhite = whiteImage();
 			image = cam.get();
-			size(1200,480);
+			size(640,480+accuHeight);
+			
 		}
+		boardRotations = new PVector(0,0,0);
 	}
 
 	@Override
@@ -97,10 +105,23 @@ public class ImageProcessing extends PApplet {
 		camera = cam.get();
 		sobel = applyAll(camera);
 		image(camera, 0, 0);
-		//camera.resize(50, 50);
-		image(accuImg, 0, camera.height);
-		image(sobel, camera.width, 0);
-		
+		ArrayList<PVector> returnedCorners = hough(sobel, 4, tabCos, tabSin);
+		if(sobel.height>0 && sobel.width>0) initialized = true;
+		else initialized = false;
+		if(!initialized){
+		sobel = new PImage(200,200);
+		}else{
+		sobel.resize(sobel.width/2,sobel.height/2);
+		TwoDThreeD dd = new TwoDThreeD(camera.width,camera.height);
+		if(returnedCorners.size()!=0){
+		PVector rotations = dd.get3DRotations(sortCorners(returnedCorners));
+		boardRotations.set(rotations);
+			}
+		}
+		backWhite.resize(sobel.width+2, sobel.height+2);
+		image(accuImg,0, camera.height);
+		image(backWhite,0,camera.height);
+		image(sobel, 0, camera.height);
 	}
 	
 	private void drawPic(){
@@ -116,11 +137,8 @@ public class ImageProcessing extends PApplet {
 		accuWidth = accuImg.width;
 		initialized = true;
 		TwoDThreeD dd = new TwoDThreeD(image.width,image.height);
-		if(returnedCorners.size()>0){
-			print(dd.get3DRotations(returnedCorners).x*60+" ");
-			print(dd.get3DRotations(returnedCorners).y*60+" ");
-			println(dd.get3DRotations(returnedCorners).z*60);
-		}
+		PVector rotations = dd.get3DRotations(sortCorners(returnedCorners));
+		boardRotations.set(rotations);
 		/*
 		bar1.display();
 		bar2.display();
@@ -606,7 +624,29 @@ public class ImageProcessing extends PApplet {
 		//TODO:
 		//Re-order the corners so that the first one is the closest to the origin(0,0) of the image.
 		//You can Use Collections.rotate to shift the corners inside the quad.size()
+		PVector upperLeft = quad.get(0);
+		for(int i = 0; i<4; i++){
+			if(quad.get(i).x<=upperLeft.x && quad.get(i).y<upperLeft.y){
+				upperLeft = quad.get(i);
+			}
+		}
+		while(quad.indexOf(upperLeft)!=0){
+			Collections.rotate(quad,0);
+		}
 		
 		return quad;
+	}
+	public static PVector rad2Deg(PVector p){
+		float radFactor = (float) (180/Math.PI);
+		return new PVector(p.x*radFactor,p.y*radFactor,p.z*radFactor);
+	}
+	public PImage whiteImage(){
+		PImage image = new PImage(200,200);
+		for(int i = 0; i<200;i++){
+			for(int j = 0; j<200;j++){
+				image.set(i, j, 255);
+			}
+		}
+		return image;
 	}
 }

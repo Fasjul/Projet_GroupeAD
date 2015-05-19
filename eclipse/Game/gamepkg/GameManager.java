@@ -1,5 +1,7 @@
 package gamepkg;
 
+import imageprocessing.ImageProcessing;
+
 import java.util.LinkedList;
 
 import objects.*;
@@ -35,7 +37,7 @@ public class GameManager {
 	/**
 	 * Current z-rotation of the game plane.
 	 */
-	public float rotZ = 0f;
+	public float rotZ = 0f;//ImageProcessing.boardRotations.z;
 	
 	/**
 	 * Processing Applet Variable.
@@ -56,17 +58,21 @@ public class GameManager {
 	private PVector oldPos;
 	private LinkedList<ClosedCylinder> oldObstacles;
 
+	private final ImageProcessing input;
+	
 	float speed = 1f;
 	boolean hold = false;
 
-	GameManager(GameApplet game, PGraphics gameGraphics, PGraphics statGraphics, Box box, Mover mover, ObstacleManager obstacles) {
+	GameManager(GameApplet game, PGraphics gameGraphics, PGraphics statGraphics, Box box, Mover mover, ObstacleManager obstacles, ImageProcessing input) {
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
 		this.STATGFX = statGraphics;
-		
 		oldObstacles = new LinkedList<>();
 		topView = GAME.createGraphics(100, 100);
 		initTopView();
+		
+		this.input = input;
+		
 		
 		this.box = box;
 		this.mover = mover;
@@ -78,8 +84,15 @@ public class GameManager {
 		drawStats();
 	}
 	
+	private void updateRot(){
+		rotX = input.boardRotations.x;	
+		rotY = input.boardRotations.y;
+		rotZ = input.boardRotations.z;
+	}
+	
 	private void drawGame() {
 		GAMEGFX.beginDraw();
+		updateRot();
 		if(hold==false) {
 			GAMEGFX.background(255);
 			GAMEGFX.camera(0, -150, 600, 0, 0, 0, 0, 1, 0);
@@ -90,10 +103,12 @@ public class GameManager {
 			GAMEGFX.popMatrix();
 
 			GAMEGFX.pushMatrix();
+			
 			GAMEGFX.rotateY(GAME.game.rotY);
 			GAMEGFX.rotateX(GAME.game.rotX);
 			GAMEGFX.rotateZ(GAME.game.rotZ);
-
+			
+			
 			GAMEGFX.fill(80, 80, 80);
 
 			box.draw();
