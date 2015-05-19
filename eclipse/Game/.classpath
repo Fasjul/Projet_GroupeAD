@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/gstreamer-java.jar"/>
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/video.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Simon/Documents/processing-2.2.1/papaya/library/papaya.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
