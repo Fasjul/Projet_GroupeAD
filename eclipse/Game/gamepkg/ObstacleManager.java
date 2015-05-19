@@ -46,9 +46,9 @@ public class ObstacleManager implements Drawable {
 	}
 
 	public void remove(ClosedCylinder c){
-		if(contains(c)){
+		/*if(contains(c)){
 			obstacleList.remove(c);
-		}
+		}*/
 	}
 
 	public void draw() {
