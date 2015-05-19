@@ -8,6 +8,9 @@ public class Mover {
 	public final float BOUNCING_COEFF = 1;
 	public final float NORMALFORCE_COEFF = 1;
 	public final float MU = 0.05f;
+	
+	public final float SCORE_MIN = 0.25f;
+	public final float SCORE_RATIO = 30f;
 
 	public final float radius;
 
@@ -15,6 +18,9 @@ public class Mover {
 	public PVector velocity;
 	public PVector gravityForce;
 	public PVector frictionForce;
+	
+	public float totalScore = 0;
+	public float lastScore = 0;
 	
 	public final GameApplet GAME;
 	public final PGraphics GAMEGFX;
@@ -54,27 +60,45 @@ public class Mover {
 
 
 	public void checkEdges(){
+		boolean collision = false;
+		float mag = velocity.mag();
+		
 		if(location.x >= GAME.game.box.width/2){
+			collision = true;
 			location.x = GAME.game.box.width/2;
 			velocity.x = velocity.x*(-1)*BOUNCING_COEFF;
 		}
-		else if(location.x <=- GAME.game.box.width/2){
+		if(location.x <=- GAME.game.box.width/2){
+			collision = true;
 			location.x = -GAME.game.box.width/2;
 			velocity.x = velocity.x*(-1)*BOUNCING_COEFF;
 		}
 		if(location.y >= GAME.game.box.depth/2){
+			collision = true;
 			location.y = GAME.game.box.depth/2;
 			velocity.y = velocity.y*(-1)*BOUNCING_COEFF;
 		}
 		if(location.y <= -GAME.game.box.depth/2){
+			collision = true;
 			location.y = -GAME.game.box.depth/2;
 			velocity.y = velocity.y*(-1)*BOUNCING_COEFF;
+		}
+		
+		if(collision && mag>=SCORE_MIN) {
+			lastScore = -mag * SCORE_RATIO;
+			totalScore += lastScore;
 		}
 	}
 
 	public void checkCylinderCollision(ObstacleManager obstacles){
 		for(ClosedCylinder cyl : obstacles.obstacleList){
 			if(cyl.collisionWithMover(this)){
+				float mag = velocity.mag();
+				if(mag >= SCORE_MIN) {
+					lastScore = mag * SCORE_RATIO;
+					totalScore += lastScore;
+				}
+				
 				PVector normal = new PVector(cyl.location.x - this.location.x, cyl.location.y - this.location.y);
 
 				PVector n = normal.get();

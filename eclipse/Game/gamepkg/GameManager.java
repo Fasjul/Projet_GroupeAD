@@ -13,50 +13,41 @@ import processing.core.PVector;
  * Connected to Processing through the GameApplet instance.
  */
 public class GameManager {
-	/**
-	 * Box object representing the game plane.
-	 */
+	/** Box object representing the game plane. */
 	public Box box;
-	/**
-	 * Object representing the ball.
-	 */
+	/** Object representing the ball. */
 	public Mover mover;
-	/**
-	 * Container which holds all obstacles (cylinders/trees).
-	 */
+	/** Container which holds all obstacles (cylinders/trees). */
 	public ObstacleManager obstacles;
 
-	/**
-	 * Current x-rotation of the game plane.
-	 */
+	/** Current x-rotation of the game plane. */
 	public float rotX = 0f;
-	/**
-	 * Current y-rotation of the game plane.
-	 */
+	/** Current y-rotation of the game plane. */
 	public float rotY = 0f;
 	/**
 	 * Current z-rotation of the game plane.
 	 */
 	public float rotZ = 0f;//ImageProcessing.boardRotations.z;
 	
-	/**
-	 * Processing Applet Variable.
-	 */
-	public final GameApplet GAME;
-	/**
-	 * Game draw variable.
-	 */
-	public final PGraphics GAMEGFX;
-	/**
-	 * Data visualisation variable.
-	 */
-	public final PGraphics STATGFX;
-	/**
-	 * Top View Graphics
-	 */
-	private final PGraphics topView;
 	private PVector oldPos;
 	private LinkedList<ClosedCylinder> oldObstacles;
+	
+	/** Processing Applet Variable. */
+	public final GameApplet GAME;
+	/** Game draw variable. */
+	public final PGraphics GAMEGFX;
+	/** Data visualisation variable. */
+	public final PGraphics STATGFX;
+// Internal variables to the data visualisation
+	/** Top View Graphics */
+	private final PGraphics topView;
+	/** Textual score board */
+	private final PGraphics scoreBoard;
+	/** Bar chart of WHAT? */
+	private final PGraphics barChart;
+// Internal variables for the style of the data visualisation
+	private int statBgColor;
+	private int statSpacing;
 
 	private final ImageProcessing input;
 	
@@ -67,13 +58,18 @@ public class GameManager {
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
 		this.STATGFX = statGraphics;
+
+		statBgColor = STATGFX.color(200);
+		statSpacing = 5;
 		oldObstacles = new LinkedList<>();
 		topView = GAME.createGraphics(100, 100);
 		initTopView();
 		
+		
+		scoreBoard = GAME.createGraphics(80, 100);
+		barChart = GAME.createGraphics(GAMEGFX.width - 200, 80);
+		
 		this.input = input;
-		
-		
 		this.box = box;
 		this.mover = mover;
 		this.obstacles = obstacles;
@@ -155,8 +151,23 @@ public class GameManager {
 	
 	private void drawStats() {
 		STATGFX.beginDraw();
+			STATGFX.background(statBgColor);
+			STATGFX.stroke(150);
+			STATGFX.line(0, 0, STATGFX.width, 0);
+			STATGFX.stroke(180);
+			STATGFX.line(0, 1, STATGFX.width, 1);
+			
+			// update top view
 			updateTopView();
-			STATGFX.image(topView, 5, 5);
+			STATGFX.image(topView, statSpacing, statSpacing);
+			
+			// update score board
+			updateScoreBoard();
+			STATGFX.image(scoreBoard, statSpacing+topView.width+statSpacing, statSpacing);
+			
+			// update bar chart
+			updateBarChart();
+			STATGFX.image(barChart, statSpacing+topView.width+statSpacing+scoreBoard.width+statSpacing, statSpacing);
 		STATGFX.endDraw();
 		GAME.image(STATGFX, 0, 600);
 	}
@@ -207,4 +218,34 @@ public class GameManager {
 			topView.popMatrix();
 		topView.endDraw();
 	}
+	
+	private void updateScoreBoard() {
+		scoreBoard.beginDraw();
+			scoreBoard.stroke(100);
+			scoreBoard.fill(statBgColor);
+			scoreBoard.rect(0, 0, scoreBoard.width-1, scoreBoard.height-1);
+			
+			scoreBoard.textSize(10);
+			scoreBoard.fill(0);
+			
+			scoreBoard.text("Total score:", 4, 13);
+			scoreBoard.text(mover.totalScore,  8, 24);
+			
+			scoreBoard.text("Velocity:", 4, 35);
+			scoreBoard.text(mover.velocity.mag(), 8, 48);
+			
+			scoreBoard.text("Last score:", 4, 60);
+			scoreBoard.text(mover.lastScore, 8, 70);
+		scoreBoard.endDraw();
+	}
+	
+	private void updateBarChart() {
+		barChart.beginDraw();
+			barChart.background(statBgColor);
+			
+			int t = GAME.frame()/3;
+			barChart.line(t, barChart.height, t, barChart.height-mover.totalScore/5);
+		barChart.endDraw();
+	}
+	
 }
