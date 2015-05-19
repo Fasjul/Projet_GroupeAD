@@ -115,11 +115,14 @@ public class GameApplet extends PApplet {
 				toAdd.setColor(255, 255, 51);
 
 			} else if(mouseButton == RIGHT) {
+				System.out.println("Feature not implemented yet");
+				/*
 				for(ClosedCylinder c : game.obstacles.obstacleList) {
 					if(ghost.collisionWithCylinder(c)) {
 						game.obstacles.remove(c);
 					}
 				}
+				*/
 			}
 		} else {
 			noFill();
