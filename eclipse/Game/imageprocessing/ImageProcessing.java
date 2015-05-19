@@ -1,4 +1,4 @@
-package cs211.imageprocessing;
+package imageprocessing;
 
 import java.util.ArrayList;
 import java.util.Collections;
