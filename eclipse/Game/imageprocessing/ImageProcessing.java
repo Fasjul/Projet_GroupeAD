@@ -27,6 +27,7 @@ public class ImageProcessing extends PApplet {
 	private int phiDim = (int)(Math.PI/discretizationStepPhi);
 	private float[] tabSin = new float[phiDim];
 	private float[] tabCos = new float[phiDim];
+	
 	/**
 	 * Some graphic init
 	 */
@@ -97,9 +98,9 @@ public class ImageProcessing extends PApplet {
 		sobel = applyAll(camera);
 		image(camera, 0, 0);
 		//camera.resize(50, 50);
-		hough(sobel, 4, tabCos, tabSin);
 		image(accuImg, 0, camera.height);
 		image(sobel, camera.width, 0);
+		
 	}
 	
 	private void drawPic(){
@@ -110,9 +111,16 @@ public class ImageProcessing extends PApplet {
 		}
 		image(image, 0, 0);
 		image(sobel, image.width +accuWidth/2-shiftOnAccu, 0);
-		hough(sobel, 100, tabCos, tabSin);
+
+		ArrayList<PVector> returnedCorners = hough(sobel, 100, tabCos, tabSin);
 		accuWidth = accuImg.width;
 		initialized = true;
+		TwoDThreeD dd = new TwoDThreeD(image.width,image.height);
+		if(returnedCorners.size()>0){
+			print(dd.get3DRotations(returnedCorners).x*60+" ");
+			print(dd.get3DRotations(returnedCorners).y*60+" ");
+			println(dd.get3DRotations(returnedCorners).z*60);
+		}
 		/*
 		bar1.display();
 		bar2.display();
@@ -525,17 +533,17 @@ public class ImageProcessing extends PApplet {
 			}
 			
 		}
-		
+		ArrayList<PVector> corners2D = new ArrayList<PVector>();
 		//plot intersections
 				int Lsize = selectedVertices.size();
 				if(Lsize>4) Lsize = 4;
 				for(int i = 0; i<Lsize;i++){
 					PVector v = selectedVertices.get(i);
+					corners2D.add(v);
 					fill(255,128,0);
 					ellipse(v.x,v.y,10,10);
 				}
-		
-		return selectedVertices;
+		return corners2D;
 	}
 
 	private PVector intersection(PVector line1, PVector line2,float[]tabCos, float[] tabSin){
@@ -584,5 +592,21 @@ public class ImageProcessing extends PApplet {
 		sobel = applyAll(image);
 		image(sobel, 0, 0);
 
+	}
+	
+	
+	public static List<PVector> sortCorners(List<PVector> quad){
+		//Sort corners so that they are ordered clockwise
+		PVector a = quad.get(0);
+		PVector b = quad.get(2);
+		PVector center = new PVector((a.x+b.x)/2,(a.y+b.y)/2);
+		
+		Collections.sort(quad, new CWComparator(center));
+		
+		//TODO:
+		//Re-order the corners so that the first one is the closest to the origin(0,0) of the image.
+		//You can Use Collections.rotate to shift the corners inside the quad.size()
+		
+		return quad;
 	}
 }

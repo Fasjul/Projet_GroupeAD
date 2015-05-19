@@ -24,7 +24,10 @@ public class TwoDThreeD {
 							// Store here the 3D coordinates of the corners of
 							// the real Lego board, in homogenous coordinates
 							// and clockwise.
-
+							{-128,-128,0,1},
+							{128,-128,0,1},
+							{128,128,0,1},
+							{-128,128,0,1}
 							};
 	
 	public TwoDThreeD(int width, int height) {
@@ -90,8 +93,10 @@ public class TwoDThreeD {
 			p[0] = points2D.get(i).x;
 			p[1] = points2D.get(i).y;
 			p[2] = points2D.get(i).z;
-			Mat.multiply(invK,p);
+			//System.out.println(p[0]+","+p[1]+","+p[2]); //TODO hello
+			projectedCorners[i] = Mat.multiply(invK,p);
 		}
+        
 		
 		// 'A' contains the cross-product (K^(-1) · p) X P
 	    float[][] A= new float[12][9];
@@ -139,7 +144,9 @@ public class TwoDThreeD {
 
 	    SVD svd=new SVD(A);
 	    
+	    
 	    double[][] V = svd.getV();
+	    
 	    
 	    double[][] E = new double[3][3];
 	    
