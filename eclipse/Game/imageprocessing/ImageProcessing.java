@@ -1,5 +1,6 @@
 package imageprocessing;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +38,6 @@ public class ImageProcessing extends PApplet{
 	private final int shiftOnAccu = 100;
 	private PImage backWhite = new PImage(200,200);
 	private int accuHeight = 525;
-	int i =0;
 	//HScrollbar for Hue/Brightness settings
 	//private HScrollbar bar1;
 	//private HScrollbar bar2;
@@ -73,7 +73,8 @@ public class ImageProcessing extends PApplet{
 		if(!useCamera) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
 			image.resize((int)((image.width)*scaling), (int)((image.height)*scaling));
-			size(image.width+(accuWidth/2-shiftUnderNormal)+(image.width)-shiftOnAccu, (int)((image.height)));
+			size(640,480+accuHeight);
+			//size(image.width+(accuWidth/2-shiftUnderNormal)+(image.width)-shiftOnAccu, (int)((image.height)));
 			//bar1 = new HScrollbar(this, width-width/4-20, image.height+10, width/4, 20);
 			//bar2 = new HScrollbar(this, width-width/4-20,image.height+40, width/4, 20);
 		} else {
@@ -105,7 +106,7 @@ public class ImageProcessing extends PApplet{
 		camera = cam.get();
 		sobel = applyAll(camera);
 		image(camera, 0, 0);
-		ArrayList<PVector> returnedCorners = hough(sobel, 4, tabCos, tabSin);
+		ArrayList<PVector> returnedCorners = hough(sobel, 100, tabCos, tabSin);
 		if(sobel.height>0 && sobel.width>0) initialized = true;
 		else initialized = false;
 		if(!initialized){
@@ -128,17 +129,22 @@ public class ImageProcessing extends PApplet{
 		sobel = applyAll(image);
 		if(initialized){
 		accuImg.resize(accuWidth, image.height);
-		image(accuImg, image.width/2+shiftUnderNormal, 0);
+		image(accuImg, 0, image.height);
 		}
 		image(image, 0, 0);
-		image(sobel, image.width +accuWidth/2-shiftOnAccu, 0);
-
 		ArrayList<PVector> returnedCorners = hough(sobel, 100, tabCos, tabSin);
+		sobel.resize(sobel.width/2, sobel.height/2);
+		backWhite = whiteImage();
+		backWhite.resize(sobel.width+6, sobel.height+6);
+		image(backWhite,0,image.height);
+		image(sobel, 3, image.height+3);
 		accuWidth = accuImg.width;
 		initialized = true;
 		TwoDThreeD dd = new TwoDThreeD(image.width,image.height);
+		if(returnedCorners.size()!=0){
 		PVector rotations = dd.get3DRotations(sortCorners(returnedCorners));
 		boardRotations.set(rotations);
+		}
 		/*
 		bar1.display();
 		bar2.display();
@@ -644,7 +650,7 @@ public class ImageProcessing extends PApplet{
 		PImage image = new PImage(200,200);
 		for(int i = 0; i<200;i++){
 			for(int j = 0; j<200;j++){
-				image.set(i, j, 255);
+				image.set(i, j, color(255,255,255,255));
 			}
 		}
 		return image;

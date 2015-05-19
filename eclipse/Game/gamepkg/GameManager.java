@@ -81,14 +81,13 @@ public class GameManager {
 	}
 	
 	private void updateRot(){
-		rotX = input.boardRotations.x;	
-		rotY = input.boardRotations.y;
+		rotX = (float) (input.boardRotations.x-Math.PI/2);	
+		rotY = (float) (input.boardRotations.y+Math.PI/2);
 		rotZ = input.boardRotations.z;
 	}
 	
 	private void drawGame() {
 		GAMEGFX.beginDraw();
-		updateRot();
 		if(hold==false) {
 			GAMEGFX.background(255);
 			GAMEGFX.camera(0, -150, 600, 0, 0, 0, 0, 1, 0);
@@ -99,7 +98,7 @@ public class GameManager {
 			GAMEGFX.popMatrix();
 
 			GAMEGFX.pushMatrix();
-			
+			updateRot();
 			GAMEGFX.rotateY(GAME.game.rotY);
 			GAMEGFX.rotateX(GAME.game.rotX);
 			GAMEGFX.rotateZ(GAME.game.rotZ);
