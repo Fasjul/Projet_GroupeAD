@@ -106,7 +106,7 @@ public class ImageProcessing extends PApplet{
 		camera = cam.get();
 		sobel = applyAll(camera);
 		image(camera, 0, 0);
-		ArrayList<PVector> returnedCorners = hough(sobel, 100, tabCos, tabSin);
+		ArrayList<PVector> returnedCorners = hough(sobel, 4, tabCos, tabSin);
 		if(sobel.height>0 && sobel.width>0) initialized = true;
 		else initialized = false;
 		if(!initialized){
@@ -538,23 +538,20 @@ public class ImageProcessing extends PApplet{
 			
 			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 8000) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
 				//draw options
-//				if(showQuads){
-//					/*
-//					if(board==4){
-//						fill(color(min(255,random.nextInt(300)),150,150,30));
-//					}else
-//					*/
-//					if(useCamera){
-//						fill(color(35,15,170,140));
-//					}else{
-//						fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),30));
-//					}
-//					quad(c1.x,c1.y,c2.x,c2.y,c3.x,c3.y,c4.x,c4.y);
-//				}
-				
-				if(selectedVertices.size()>10){
-					selectedVertices.clear();
+				if(showQuads){
+					/*
+					if(board==4){
+						fill(color(min(255,random.nextInt(300)),150,150,30));				
+							}else
+					*/
+					if(useCamera){
+						fill(color(35,15,170,140));
+					}else{
+						fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),30));
+					}
+					quad(c1.x,c1.y,c2.x,c2.y,c3.x,c3.y,c4.x,c4.y);
 				}
+//				
 				selectedVertices.add(c1);
 				selectedVertices.add(c2);
 				selectedVertices.add(c3);
