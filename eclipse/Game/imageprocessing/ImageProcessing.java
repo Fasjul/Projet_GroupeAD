@@ -47,7 +47,7 @@ public class ImageProcessing extends PApplet{
 	 * Set to true if you want to use the camera feed,
 	 * false for static image.
 	 */
-	private final boolean useCamera = true;
+	private final boolean useCamera = false;
 	
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
@@ -143,6 +143,7 @@ public class ImageProcessing extends PApplet{
 		TwoDThreeD dd = new TwoDThreeD(image.width,image.height);
 		if(returnedCorners.size()!=0){
 		PVector rotations = dd.get3DRotations(sortCorners(returnedCorners));
+		//println(rad2Deg(rotations));
 		boardRotations.set(rotations);
 		}
 		/*
