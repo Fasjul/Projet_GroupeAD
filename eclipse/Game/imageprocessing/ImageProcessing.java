@@ -20,7 +20,7 @@ public class ImageProcessing extends PApplet{
 	
 	private Random random = new Random();
 
-	private PImage camera, sobel, image, accuImg;
+	private PImage camera, sobel, image, accuImg,hsb;
 	private Capture cam;
 	float discretizationStepPhi = 0.006f;
 	float discretizationStepR = 2.5f;
@@ -105,24 +105,39 @@ public class ImageProcessing extends PApplet{
 		}
 		camera = cam.get();
 		sobel = applyAll(camera);
-		image(camera, 0, 0);
+		hsb = hsbFilter(camera);
+		
 		ArrayList<PVector> returnedCorners = hough(sobel, 4, tabCos, tabSin);
 		if(sobel.height>0 && sobel.width>0) initialized = true;
 		else initialized = false;
 		if(!initialized){
 		sobel = new PImage(200,200);
+		hsb = new PImage(200,200);
 		}else{
 		sobel.resize(sobel.width/2,sobel.height/2);
+		hsb.resize(sobel.width, sobel.height);
 		TwoDThreeD dd = new TwoDThreeD(camera.width,camera.height);
 		if(returnedCorners.size()!=0){
 		PVector rotations = dd.get3DRotations(sortCorners(returnedCorners));
 		boardRotations.set(rotations);
 			}
 		}
+		BlobDetection BlobD;
+		if(returnedCorners.size()>=4){
+			BlobD = new BlobDetection(this,returnedCorners.get(0),returnedCorners.get(1),returnedCorners.get(2),returnedCorners.get(3));
+		}else{
+			BlobD = new BlobDetection(this,new PVector(0,0),new PVector(0,0),new PVector(0,0),new PVector(0,0));
+		}
 		backWhite.resize(sobel.width+2, sobel.height+2);
+		image(camera, 0, 0);
 		image(accuImg,0, camera.height);
 		image(backWhite,0,camera.height);
 		image(sobel, 0, camera.height);
+		
+		//
+		hsb = hsbFilter(camera);
+		image(BlobD.findConnectedComponents(hsb),0,0);
+		
 	}
 	
 	private void drawPic(){
@@ -250,14 +265,13 @@ public class ImageProcessing extends PApplet{
 	}
 
 
-
 	public PImage hsbFilter(PImage img) {
 		float hueMin =  80f; // hue minimum
 		float hueMax = 140f; // hue maximum
 		
 		float bMin =  20f;  // brightness minimum
 		float bMax = 240f;  // brightness maximum
-
+		
 		float sMin = 60f;  // saturation minimum
 		
 		final int width = img.width;
