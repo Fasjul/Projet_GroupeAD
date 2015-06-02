@@ -28,29 +28,29 @@ public class GameManager {
 	 * Current z-rotation of the game plane.
 	 */
 	public float rotZ = 0f;//ImageProcessing.boardRotations.z;
-	
+
 	private PVector oldPos;
 	private LinkedList<ClosedCylinder> oldObstacles;
-	
+
 	/** Processing Applet Variable. */
 	public final GameApplet GAME;
 	/** Game draw variable. */
 	public final PGraphics GAMEGFX;
 	/** Data visualisation variable. */
 	public final PGraphics STATGFX;
-// Internal variables to the data visualisation
+	// Internal variables to the data visualisation
 	/** Top View Graphics */
 	private final PGraphics topView;
 	/** Textual score board */
 	private final PGraphics scoreBoard;
 	/** Bar chart of WHAT? */
 	private final PGraphics barChart;
-// Internal variables for the style of the data visualisation
+	// Internal variables for the style of the data visualisation
 	private int statBgColor;
 	private int statSpacing;
 
 	private final ImageProcessing input;
-	
+
 	float speed = 1f;
 	boolean hold = false;
 
@@ -64,11 +64,11 @@ public class GameManager {
 		oldObstacles = new LinkedList<>();
 		topView = GAME.createGraphics(100, 100);
 		initTopView();
-		
-		
+
+
 		scoreBoard = GAME.createGraphics(80, 100);
 		barChart = GAME.createGraphics(GAMEGFX.width - 200, 80);
-		
+
 		this.input = input;
 		this.box = box;
 		this.mover = mover;
@@ -79,13 +79,13 @@ public class GameManager {
 		drawGame();
 		drawStats();
 	}
-	
+
 	private void updateRot(){
 		rotX = (float) (input.boardRotations.x);
 		rotZ = -input.boardRotations.y;
 		rotY = input.boardRotations.z;
 	}
-	
+
 	private void drawGame() {
 		GAMEGFX.pushMatrix();
 		GAMEGFX.beginDraw();
@@ -93,9 +93,9 @@ public class GameManager {
 			GAMEGFX.background(255);
 			GAMEGFX.camera(0, -150, 600, 0, 0, 0, 0, 1, 0);
 			GAMEGFX.pushMatrix();
-				GAMEGFX.translate(0, -300, 0);
-				GAMEGFX.directionalLight(255, 255, 255, 0, 1, 0);
-				GAMEGFX.ambientLight(100,100,100);
+			GAMEGFX.translate(0, -300, 0);
+			GAMEGFX.directionalLight(255, 255, 255, 0, 1, 0);
+			GAMEGFX.ambientLight(100,100,100);
 			GAMEGFX.popMatrix();
 
 			GAMEGFX.pushMatrix();
@@ -103,8 +103,8 @@ public class GameManager {
 			GAMEGFX.rotateY(GAME.game.rotY);
 			GAMEGFX.rotateX(GAME.game.rotX);
 			GAMEGFX.rotateZ(GAME.game.rotZ);
-			
-			
+
+
 			GAMEGFX.fill(80, 80, 80);
 
 			box.draw();
@@ -142,111 +142,111 @@ public class GameManager {
 				GAMEGFX.stroke(GAMEGFX.color(230,0,0));
 			}
 			ghost.draw();
-			
+
 			GAMEGFX.noStroke();
 		}
 		GAMEGFX.endDraw();
 		GAME.image(GAMEGFX, 0, 0);
 		GAMEGFX.popMatrix();
 	}
-	
+
 	private void drawStats() {
 		STATGFX.beginDraw();
-			STATGFX.background(statBgColor);
-			STATGFX.stroke(150);
-			STATGFX.line(0, 0, STATGFX.width, 0);
-			STATGFX.stroke(180);
-			STATGFX.line(0, 1, STATGFX.width, 1);
-			
-			// update top view
-			updateTopView();
-			STATGFX.image(topView, statSpacing, statSpacing);
-			
-			// update score board
-			updateScoreBoard();
-			STATGFX.image(scoreBoard, statSpacing+topView.width+statSpacing, statSpacing);
-			
-			// update bar chart
-			updateBarChart();
-			STATGFX.image(barChart, statSpacing+topView.width+statSpacing+scoreBoard.width+statSpacing, statSpacing);
+		STATGFX.background(statBgColor);
+		STATGFX.stroke(150);
+		STATGFX.line(0, 0, STATGFX.width, 0);
+		STATGFX.stroke(180);
+		STATGFX.line(0, 1, STATGFX.width, 1);
+
+		// update top view
+		updateTopView();
+		STATGFX.image(topView, statSpacing, statSpacing);
+
+		// update score board
+		updateScoreBoard();
+		STATGFX.image(scoreBoard, statSpacing+topView.width+statSpacing, statSpacing);
+
+		// update bar chart
+		updateBarChart();
+		STATGFX.image(barChart, statSpacing+topView.width+statSpacing+scoreBoard.width+statSpacing, statSpacing);
 		STATGFX.endDraw();
 		GAME.image(STATGFX, 0, 600);
 	}
-	
+
 	private void initTopView() {
 		topView.beginDraw();
-			topView.noStroke();
-			topView.background(topView.color(100, 100, 255));
-			oldPos = new PVector(0, 0);
+		topView.noStroke();
+		topView.background(topView.color(100, 100, 255));
+		oldPos = new PVector(0, 0);
 		topView.endDraw();
 	}
-	
+
 	private void updateTopView() {
 		topView.beginDraw();
-			topView.noStroke();
-			Mover mv = GAME.game.mover;
-			float factor = GAME.game.box.width/100;
-			PVector relativePos = mv.location.get();
-				relativePos.mult(1/factor);
-			float relativeSize = 2*mv.radius/factor;
-			
-			topView.pushMatrix();
-				topView.translate(50, 50);
-				topView.fill(90, 90, 255);
-				topView.ellipse(oldPos.x, oldPos.y, relativeSize+1f, relativeSize+1f);
-				topView.fill(255, 0, 0);
-				topView.ellipse(relativePos.x, relativePos.y, relativeSize, relativeSize);
-				
-				for(ClosedCylinder c : oldObstacles) {
-					topView.fill(100, 100, 255);
-					float radius = 2*c.radius/factor + 1;
-					topView.ellipse(c.location.x/factor, c.location.y/factor, radius, radius);
-				}
-				
-				for(ClosedCylinder c : obstacles.obstacleList) {
-					topView.fill(255);
-					float radius = 2*c.radius/factor;
-					topView.ellipse(c.location.x/factor, c.location.y/factor, radius, radius);
-				}
-				
-				oldObstacles.clear();
-				for(ClosedCylinder c : obstacles.obstacleList) {
-					oldObstacles.add(c);
-				}
-				
-				oldPos.x = relativePos.x;
-				oldPos.y = relativePos.y;
-			topView.popMatrix();
+		topView.noStroke();
+		Mover mv = GAME.game.mover;
+		float factor = GAME.game.box.width/100;
+		PVector relativePos = mv.location.get();
+		relativePos.mult(1/factor);
+		float relativeSize = 2*mv.radius/factor;
+
+		topView.pushMatrix();
+		topView.translate(50, 50);
+		topView.fill(90, 90, 255);
+		topView.ellipse(oldPos.x, oldPos.y, relativeSize+1f, relativeSize+1f);
+		topView.fill(255, 0, 0);
+		topView.ellipse(relativePos.x, relativePos.y, relativeSize, relativeSize);
+
+		for(ClosedCylinder c : oldObstacles) {
+			topView.fill(100, 100, 255);
+			float radius = 2*c.radius/factor + 1;
+			topView.ellipse(c.location.x/factor, c.location.y/factor, radius, radius);
+		}
+
+		for(ClosedCylinder c : obstacles.obstacleList) {
+			topView.fill(255);
+			float radius = 2*c.radius/factor;
+			topView.ellipse(c.location.x/factor, c.location.y/factor, radius, radius);
+		}
+
+		oldObstacles.clear();
+		for(ClosedCylinder c : obstacles.obstacleList) {
+			oldObstacles.add(c);
+		}
+
+		oldPos.x = relativePos.x;
+		oldPos.y = relativePos.y;
+		topView.popMatrix();
 		topView.endDraw();
 	}
-	
+
 	private void updateScoreBoard() {
 		scoreBoard.beginDraw();
-			scoreBoard.stroke(100);
-			scoreBoard.fill(statBgColor);
-			scoreBoard.rect(0, 0, scoreBoard.width-1, scoreBoard.height-1);
-			
-			scoreBoard.textSize(10);
-			scoreBoard.fill(0);
-			
-			scoreBoard.text("Total score:", 4, 13);
-			scoreBoard.text(mover.totalScore,  8, 24);
-			
-			scoreBoard.text("Velocity:", 4, 35);
-			scoreBoard.text(mover.velocity.mag(), 8, 48);
-			
-			scoreBoard.text("Last score:", 4, 60);
-			scoreBoard.text(mover.lastScore, 8, 70);
+		scoreBoard.stroke(100);
+		scoreBoard.fill(statBgColor);
+		scoreBoard.rect(0, 0, scoreBoard.width-1, scoreBoard.height-1);
+
+		scoreBoard.textSize(10);
+		scoreBoard.fill(0);
+
+		scoreBoard.text("Total score:", 4, 13);
+		scoreBoard.text(mover.totalScore,  8, 24);
+
+		scoreBoard.text("Velocity:", 4, 35);
+		scoreBoard.text(mover.velocity.mag(), 8, 48);
+
+		scoreBoard.text("Last score:", 4, 60);
+		scoreBoard.text(mover.lastScore, 8, 70);
 		scoreBoard.endDraw();
 	}
-	
+
 	private void updateBarChart() {
 		barChart.beginDraw();
-			barChart.background(statBgColor);
-			
-			int t = GAME.frame()/3;
-			barChart.line(t, barChart.height, t, barChart.height-mover.totalScore/5);
+		barChart.background(statBgColor);
+
+		int t = GAME.frame()/3;
+		barChart.line(t, barChart.height, t, barChart.height-mover.totalScore/5);
 		barChart.endDraw();
 	}
-	
+
 }

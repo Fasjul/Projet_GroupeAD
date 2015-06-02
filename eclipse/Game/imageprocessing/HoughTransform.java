@@ -35,5 +35,5 @@ public class HoughTransform extends PApplet{
 		img = cam.get();
 		image(img,0,0);
 	}
-	
+
 }
