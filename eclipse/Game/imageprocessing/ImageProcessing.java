@@ -21,9 +21,10 @@ public class ImageProcessing extends PApplet{
 
 	private PImage camera, sobel, image, accuImg,hsb;
 	private Capture cam;
+	
+	// Hough Values
 	float discretizationStepPhi = 0.006f;
 	float discretizationStepR = 2.5f;
-	boolean cameraBool = false;
 	private int phiDim = (int)(Math.PI/discretizationStepPhi);
 	private float[] tabSin = new float[phiDim];
 	private float[] tabCos = new float[phiDim];
@@ -37,9 +38,6 @@ public class ImageProcessing extends PApplet{
 	//	private final int shiftOnAccu = 100;
 	private PImage backWhite = new PImage(200,200);
 	private int accuHeight = 525;
-	// HScrollbar for Hue/Brightness settings
-	//	private HScrollbar bar1;
-	//	private HScrollbar bar2;
 
 	// The following is hard code which can't be changed during execution (yet)
 	/**
@@ -390,23 +388,20 @@ public class ImageProcessing extends PApplet{
 	public ArrayList<PVector> hough(PImage edgeImg, int nLines, float[] tabCos, float[] tabSin){
 
 		int rDim = (int)(((edgeImg.width+edgeImg.height)*2+1)/discretizationStepR);
-		//dimensions of the accumulator
-		////
-
-		//accumulator with a 1pix margin around
+		// Dimensions of the accumulator
+		// (accumulator with a 1pix margin around)
 		int[] accumulator = new int[(phiDim+2)*(rDim+2)];
 
 
-		//Fill the accumulator: on edge point (white pixel of the edgeImg), store all possible (r,phi) pair discribing 
-		//lines going through this point
-		for(int y = 0; y<edgeImg.height;y++){
-			for(int x = 0; x<edgeImg.width;x++){
-				//are we on edge?
+		// Fill the accumulator: on edge point (white pixel of the edgeImg), store all 
+		// possible (r,phi) pair describing lines going through this point
+		for(int y = 0; y<edgeImg.height; y++){
+			for(int x = 0; x<edgeImg.width; x++){
+				// Are we on an edge?
 				if(brightness(edgeImg.pixels[y*edgeImg.width+x])!=0){
 
-					//...determine all the lines (r,phi) passing through
-					// pixel(x,y), convert(r, phi) to coordinates in accumulator, increment accumulator;
-
+					// Determine all the lines (r,phi) passing through pixel (x,y), convert (r, phi) 
+					// to coordinates in accumulator, increment accumulator:
 					for(int accPhi = 0; accPhi<phiDim; accPhi++){
 
 						float r = (x)*tabCos[accPhi]+(y)*tabSin[accPhi];
@@ -418,8 +413,9 @@ public class ImageProcessing extends PApplet{
 
 					}
 				}
-			}		
-		}			
+			}
+		}
+		
 		accuImg = createImage(rDim+2, phiDim+2, ALPHA);
 		for(int i=0; i<accumulator.length; i++) {
 			accuImg.pixels[i] = color(min(255, accumulator[i]));
@@ -429,8 +425,8 @@ public class ImageProcessing extends PApplet{
 
 		// Select the candidates
 		ArrayList<Integer> bestCandidates = new ArrayList<Integer>();
-		int minVotes = 200;
-		int neighbourhood = 10;
+		final int minVotes = 200;
+		final int neighbourhood = 10;
 
 		for(int accR = 0; accR< rDim; accR++){
 			for(int accPhi = 0; accPhi< phiDim; accPhi++){
@@ -446,7 +442,7 @@ public class ImageProcessing extends PApplet{
 						//check we are not outside the image
 
 						if(accPhi + dPhi <0 || accPhi+dPhi >= phiDim) continue;
-						for(int dR =- neighbourhood/2 ; dR<neighbourhood/2 +1; dR++){
+						for(int dR = -(neighbourhood/2); dR<(neighbourhood/2)+1; dR++){
 							if(accR+dR<0 || accR+dR>= rDim) continue;
 
 							int neighbourIdx = (accPhi + dPhi +1) * (rDim+2) + accR + dR +1;
@@ -466,26 +462,26 @@ public class ImageProcessing extends PApplet{
 				}
 			}
 		}
-		//Cartesian equation of a line : y = ax+b
+		// Cartesian equation of a line : y = ax+b
 		// in polar : y = (-cos(phi)/sin(phi))x+(r/sin(phi)
 		// => y = 0 : x = r/cos(phi)
 		// => x = 0 : y = r/sin(phi)
 
-		//plot
+		// Plot
 		Collections.sort(bestCandidates,new HoughComparator(accumulator));
 		ArrayList<PVector> lines = new ArrayList<PVector>();
 
-		for(int i = 0; i<nLines;i++){
+		for(int i=0; i<nLines;i++){
 			if(i<bestCandidates.size()){
 
-				//compute the intersection of this  line with the 4 borders of the image
+				// Compute the intersection of this  line with the 4 borders of the image
 				int idx = bestCandidates.get(i);
-				int accPhi = (int)(idx/(rDim+2))-1;
-				int accR = idx - (accPhi+1)*(rDim+2)-1;
-				float r = (accR - (rDim-1)*0.5f)*discretizationStepR;	 					
+				int accPhi = (int)(idx/(rDim+2)) -1;
+				int accR = idx - (accPhi+1) * (rDim+2)-1;
+				float r = (accR - (rDim-1)*0.5f) * discretizationStepR;	 					
 				float phi = accPhi*discretizationStepPhi;
 
-				//accVectors.add(new PVector(r,accPhi));
+//				accVectors.add(new PVector(r,accPhi));
 				lines.add(new PVector(r,phi));
 
 				int x0 = 0;
@@ -500,23 +496,23 @@ public class ImageProcessing extends PApplet{
 				if(plotLines){
 					//Finally, plot the lines
 					stroke(204,102,0);
-					if(y0>0){
-						if(x1>0){
-							line(x0,y0,x1,y1);
-						}else if(y2>0) {
-							line(x0,y0,x2,y2);
-						}else {
-							line(x0,y0,x3,y3);
+					if(y0 > 0){
+						if(x1 > 0){
+							line(x0, y0, x1, y1);
+						} else if(y2 > 0) {
+							line(x0, y0, x2, y2);
+						} else {
+							line(x0, y0, x3, y3);
 						}
-					}else{
-						if(x1>0){
-							if(y2>0){
-								line(x1,y1,x2,y2);
-							}else {
-								line(x1,y1,x3,y3);
+					} else {
+						if(x1 > 0){
+							if(y2 > 0){
+								line(x1, y1, x2, y2);
+							} else {
+								line(x1, y1, x3, y3);
 							}
-						}else{
-							line(x2,y2,x3,y3);
+						} else {
+							line(x2, y2, x3, y3);
 						}
 					}
 				}
@@ -528,14 +524,14 @@ public class ImageProcessing extends PApplet{
 		List<int[]> quads = quadgraph.findCycles();
 		ArrayList<PVector> selectedVertices = new ArrayList<PVector>();
 
-		//plot the quads 
+		// Plot the quads 
 		for(int[] quad : quads){
 			PVector l1= lines.get(quad[0]);
 			PVector l2= lines.get(quad[1]);
 			PVector l3= lines.get(quad[2]);
 			PVector l4= lines.get(quad[3]);
 
-			//Convert for use of intersection
+			// Convert for use of intersection
 			l1 = new PVector(l1.x,l1.y/discretizationStepPhi);
 			l2 = new PVector(l2.x,l2.y/discretizationStepPhi);
 			l3 = new PVector(l3.x,l3.y/discretizationStepPhi);
@@ -545,7 +541,7 @@ public class ImageProcessing extends PApplet{
 			PVector c23 = intersection(l2,l3,tabCos,tabSin);
 			PVector c34 = intersection(l3,l4,tabCos,tabSin);
 			PVector c41 = intersection(l4,l1,tabCos,tabSin);
-			//Choose a random semi-transparent color
+			// Choose a random semi-transparent color
 
 			PVector c1 = new PVector(c12.x,c12.y);
 			PVector c2 = new PVector(c23.x,c23.y);
@@ -553,7 +549,7 @@ public class ImageProcessing extends PApplet{
 			PVector c4 = new PVector(c41.x,c41.y);
 
 			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 8000) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
-				//draw options
+				// Draw options
 				if(showQuads){
 					/*
 					if(board==4){
@@ -561,11 +557,11 @@ public class ImageProcessing extends PApplet{
 							}else
 					 */
 					if(useCamera){
-						fill(color(35,15,170,140));
-					}else{
-						fill(color(min(255,random.nextInt(300)),min(255,random.nextInt(300)),min(255,random.nextInt(255)),30));
+						fill(color(35, 15, 170, 140));
+					} else {
+						fill(color(min(255,random.nextInt(300)), min(255,random.nextInt(300)), min(255,random.nextInt(255)),30));
 					}
-					quad(c1.x,c1.y,c2.x,c2.y,c3.x,c3.y,c4.x,c4.y);
+					quad(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, c4.x, c4.y);
 				}
 				//				
 				selectedVertices.add(c1);
@@ -576,10 +572,10 @@ public class ImageProcessing extends PApplet{
 
 		}
 		ArrayList<PVector> corners2D = new ArrayList<PVector>();
-		//plot intersections
-		int Lsize = selectedVertices.size();
-		if(Lsize>4) Lsize = 4;
-		for(int i = 0; i<Lsize;i++){
+		// Plot intersections
+		int Lsize = Math.min(selectedVertices.size(), 4);
+		
+		for(int i = 0; i<Lsize; i++){
 			PVector v = selectedVertices.get(i);
 			corners2D.add(v);
 			fill(255,128,0);
@@ -594,48 +590,6 @@ public class ImageProcessing extends PApplet{
 		float y = (-line2.x*tabCos[(int)line1.y]+line1.x*tabCos[(int)line2.y])/d;
 		return new PVector(x,y);
 	}
-
-	public void test() {
-		long start, stop;
-
-		// Gaussian
-		// Gaussian sequential
-		start = System.currentTimeMillis();
-		gaussianBlur(image);
-		stop = System.currentTimeMillis();
-
-		System.out.println("Sequential gaussian took " + (stop-start) + "ms");
-
-		// HSB Filter
-		start = System.currentTimeMillis();
-		hsbFilter(image);
-		stop = System.currentTimeMillis();
-
-		System.out.println("Sequential HSB took " + (stop-start) + "ms");
-
-		// Sobel
-		// Sobel sequential
-		start = System.currentTimeMillis();
-		sobel(image);
-		stop = System.currentTimeMillis();
-
-		System.out.println("Sequential sobel took " + (stop-start) + "ms");
-
-		// ALL
-		// ALL sequential
-		start = System.currentTimeMillis();
-		applyAll(image);
-
-		stop = System.currentTimeMillis();
-
-		System.out.println("Sequential all took " + (stop-start) + "ms");
-
-		// Draw
-		sobel = applyAll(image);
-		image(sobel, 0, 0);
-
-	}
-
 
 	public static List<PVector> sortCorners(List<PVector> quad){
 		//Sort corners so that they are ordered clockwise
@@ -660,10 +614,12 @@ public class ImageProcessing extends PApplet{
 
 		return quad;
 	}
+	
 	public static PVector rad2Deg(PVector p){
 		float radFactor = (float) (180/Math.PI);
 		return new PVector(p.x*radFactor,p.y*radFactor,p.z*radFactor);
 	}
+	
 	public PImage whiteImage(){
 		PImage image = new PImage(200,200);
 		for(int i = 0; i<200;i++){
@@ -672,5 +628,46 @@ public class ImageProcessing extends PApplet{
 			}
 		}
 		return image;
+	}
+
+	public void test() {
+		long start, stop;
+	
+	// Gaussian
+		// Gaussian sequential
+		start = System.currentTimeMillis();
+		gaussianBlur(image);
+		stop = System.currentTimeMillis();
+	
+		System.out.println("Sequential gaussian took " + (stop-start) + "ms");
+	
+	// HSB Filter
+		start = System.currentTimeMillis();
+		hsbFilter(image);
+		stop = System.currentTimeMillis();
+	
+		System.out.println("Sequential HSB took " + (stop-start) + "ms");
+	
+	// Sobel
+		// Sobel sequential
+		start = System.currentTimeMillis();
+		sobel(image);
+		stop = System.currentTimeMillis();
+	
+		System.out.println("Sequential sobel took " + (stop-start) + "ms");
+	
+	// ALL
+		// ALL sequential
+		start = System.currentTimeMillis();
+		applyAll(image);
+	
+		stop = System.currentTimeMillis();
+	
+		System.out.println("Sequential all took " + (stop-start) + "ms");
+	
+	// Draw
+		sobel = applyAll(image);
+		image(sobel, 0, 0);
+	
 	}
 }
