@@ -41,7 +41,7 @@ public class BlobDetection {
 				// Check labels around
 				int y = (int)(p/input.width);
 				int x = p % input.width;
-				
+
 				// Cell neighbors
 				int[] nghbrs = new int[] { 
 					x-1, y-1,
@@ -49,7 +49,7 @@ public class BlobDetection {
 					x+1, y-1,
 					x-1, y
 				};
-				
+
 				// Get 4 neighbors labels
 				int[] values = new int[4];
 
@@ -63,7 +63,7 @@ public class BlobDetection {
 						values[i >> 1] = labels[cx + input.width*cy];
 					}
 				}
-				
+
 				// Get minimum label of neighbors
 				int minLabel = Integer.MAX_VALUE;
 				for(int i=0; i<values.length; i++) {
@@ -72,6 +72,7 @@ public class BlobDetection {
 					}
 				}
 
+				// Check if new label needed
 				if(currentLabel < minLabel) {
 					labels[p] = currentLabel++;
 					labelsEquivalences.add(new TreeSet<Integer>());
@@ -87,29 +88,45 @@ public class BlobDetection {
 				labels[p] = 0;
 			}
 		}
-		TreeSet<Integer> zero = new TreeSet<Integer>();
-		zero.add(0);
-		labelsEquivalences.add(0, zero);
-
-		//Second traversal : relabel the pixels by their equivalent class
+		
+		// Second traversal : relabel the pixels by their equivalent class
+		currentLabel = 1;
 		for(int i = 0; i<labels.length; i++){
-			if(labels[i] >= Integer.MAX_VALUE){
-				labels[i] = 0;
+			final int l = labels[i];
+			if(l != 0) {
+				TreeSet<Integer> set = labelsEquivalences.get(l-1);
+				int compVal = set.ceiling(0);
+				labels[i] = compVal;
 			}
-			labels[i] = labelsEquivalences.get(labels[i]).first();
 		}
 
-		//TODO!!
-
-		//Finally, output an image with each blob colored in one uniform color.p
+		// Finally, output an image with each blob colored in one uniform color.
 		PImage image = new PImage(input.width, input.height);
 		for(int i = 0; i<labels.length;i++){
 			int y = i/input.width;
 			int x = i % input.width;
-			image.set(x, y, (int)0b10010010100100010010011);
+			if(labels[i] > 0)
+				image.set(x, y, clr(labels[i]));
 		}
-		image.updatePixels();
 		return image;
-		//TODO!
+	}
+	
+	private int clr(int label) {
+		switch(label) {
+		case 1:
+			return applet.color(255, 0, 0);
+		case 2:
+			return applet.color(0, 255, 0);
+		case 3:
+			return applet.color(0, 0, 255);
+		case 4:
+			return applet.color(255, 255, 0);
+		case 5:
+			return applet.color(0, 255, 255);
+		case 6:
+			return applet.color(255, 0, 255);
+		default:
+			return 200*label;
+		}
 	}
 }
