@@ -106,7 +106,6 @@ public class ImageProcessing extends PApplet{
 		camera = cam.get();
 		sobel = applyAll(camera);
 		hsb = hsbFilter(camera);
-		
 		ArrayList<PVector> returnedCorners = hough(sobel, 4, tabCos, tabSin);
 		if(sobel.height>0 && sobel.width>0) initialized = true;
 		else initialized = false;
@@ -135,8 +134,9 @@ public class ImageProcessing extends PApplet{
 		image(sobel, 0, camera.height);
 		
 		//
-		hsb = hsbFilter(camera);
-		image(BlobD.findConnectedComponents(hsb),0,0);
+		hsb.resize(200, 200);
+		image(hsb,sobel.width,0);
+		//image(BlobD.findConnectedComponents(hsb),0,0);
 		
 	}
 	

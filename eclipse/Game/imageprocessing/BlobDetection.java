@@ -34,7 +34,7 @@ public class BlobDetection {
 		int[] labels = new int [input.width*input.height];
 		List<TreeSet<Integer>> labelsEquivalences = new ArrayList<TreeSet<Integer>>();
 		
-		int currentLabel = 1;
+		int currentLabel = 0;
 		
 		//TODO!!
 		for(int i = 0; i<labels.length;i++){
@@ -53,7 +53,7 @@ public class BlobDetection {
 																					///Problème ici
 				for(int j = 0; j<4;j++){
 					PVector n = nghbrs[j];
-					if(n.x<0 || n.y<0) values[j] = Integer.MAX_VALUE;
+					if(n.x<0 || n.y<0) values[j] = currentLabel;
 					else{ values[j] = labels[(int)(n.x+n.y*input.width)];
 					}
 				}
@@ -63,16 +63,16 @@ public class BlobDetection {
 				else{
 					labels[i] = minLabel;
 					for(int z = 0; z<4;z++){
-						if(values[z]<Integer.MAX_VALUE);
+						if(values[z]!=0);
 						labelsEquivalences.get(values[z]).add(minLabel);
 						}
 //					}
 				}
 			}else{
-				labels[i] = Integer.MAX_VALUE;
+				labels[i] = 0;
 			}
 		}
-		TreeSet zero = new TreeSet<Integer>();
+		TreeSet<Integer> zero = new TreeSet<Integer>();
 		zero.add(0);
 		labelsEquivalences.add(0, zero);
 		
