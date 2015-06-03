@@ -8,7 +8,7 @@ import processing.core.PVector;
 public class NeighborsComparator implements Comparator<PVector> {
 	private PImage sobel;
 	private int radius;
-	
+
 	public NeighborsComparator(PImage sobel,int radius){
 		this.sobel = sobel;
 		this.radius = radius;
@@ -19,7 +19,7 @@ public class NeighborsComparator implements Comparator<PVector> {
 		if((countWhite(o1)> countWhite(o2))|| (countWhite(o1) == countWhite(o2) && o1.x<o2.x)) return -1;
 		return 1;
 	}
-	
+
 	public int countWhite(PVector v){
 		int count = 0;
 		int lastUsedX = 0;
@@ -30,7 +30,7 @@ public class NeighborsComparator implements Comparator<PVector> {
 				int valY = (int)v.y-radius+j;
 				if(valX<0 || valX>sobel.width) valX = lastUsedX;
 				if(valY<0 || valY>sobel.height) valY = lastUsedY;
-				
+
 				if(sobel.get(valX,valY)>0) count++;
 				lastUsedX = valX;
 				lastUsedY = valY;			

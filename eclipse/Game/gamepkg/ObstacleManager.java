@@ -12,20 +12,20 @@ public class ObstacleManager implements Drawable {
 	public final float BASE_HEIGHT;
 	public final float BASE_RADIUS;
 	public final int BASE_RESOLUTION;
-	
+
 	public final GameApplet GAME;
 	public final PGraphics GAMEGFX;
 
 	public ObstacleManager(GameApplet game, PGraphics gameGraphics, float baseHeight, float baseRadius, int baseResolution) {
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
-		
+
 		this.obstacleList = new ArrayList<ClosedCylinder>();
 
 		this.BASE_HEIGHT = baseHeight;
 		this.BASE_RADIUS = baseRadius;
 		this.BASE_RESOLUTION = baseResolution;
-		
+
 		ghost = new ClosedCylinder(GAME, GAMEGFX, new PVector(0,0), BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
 		ghost.setGhost(true);
 	}

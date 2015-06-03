@@ -1,7 +1,5 @@
 package gamepkg;
 
-import java.awt.GridLayout;
-
 import imageprocessing.ImageProcessing;
 import processing.core.*;
 import processing.event.*;
@@ -13,7 +11,7 @@ public class GameApplet extends PApplet {
 	 * Generated random serial ID.
 	 */
 	private static final long serialVersionUID = 7478142574824696410L;
-	
+
 	public GameManager game;
 
 	// Mouse variables
@@ -21,11 +19,11 @@ public class GameApplet extends PApplet {
 	private int mY = 0;
 	private int bX = 0;
 	private int bY = 0;
-	
+
 	private PGraphics gameGraphics;
 	private PGraphics statGraphics;
-	
-	static ImageProcessing imageProc;
+
+	private ImageProcessing imageProc;
 	private int frame = 0;
 	/**
 	 * Mouse scroll amount (between -100 and 100)
@@ -33,13 +31,13 @@ public class GameApplet extends PApplet {
 	private int mouseScroll = 0;
 
 	public void setup() {
-		
+
 		size(1190,710, P2D);
 		noStroke();
-		
+
 		gameGraphics = createGraphics(600, 600, P3D);
 		statGraphics = createGraphics(600, 110, P2D);
-		
+
 		bX = width/2;
 		bY = height/2;
 
@@ -53,14 +51,14 @@ public class GameApplet extends PApplet {
 		final int cylinderBaseRadius = 30;
 		final int cylinderBaseHeight = 30;
 		final int cylinderResolution = 40;
-		
+
 		// TODO: Create and send Graphics variables here:
 		Box box = new Box(gameGraphics, boxWidth, boxHeight, boxDepth);
 		Mover mover = new Mover(this, gameGraphics, ballRadius);
 		ObstacleManager obstacles = new ObstacleManager(this, gameGraphics, cylinderBaseRadius, cylinderBaseHeight, cylinderResolution);
-		
+
 		game = new GameManager(this, gameGraphics, statGraphics, box, mover, obstacles, imageProc);
-		
+
 	}
 
 	public void draw() {
@@ -103,7 +101,7 @@ public class GameApplet extends PApplet {
 	=                                            =
 	==============================================
 	 */
-	
+
 	/**
 	 * Saves coordinates of the mouse when pressed down for difference (used for mouse drag)
 	 */
@@ -134,7 +132,7 @@ public class GameApplet extends PApplet {
 						game.obstacles.remove(c);
 					}
 				}
-				*/
+				 */
 			}
 		} else {
 			noFill();
@@ -208,7 +206,7 @@ public class GameApplet extends PApplet {
 			return val;
 		}
 	}
-	
+
 	public int frame() {
 		return frame;
 	}
@@ -222,25 +220,26 @@ public class GameApplet extends PApplet {
 	public PVector getGamePos(int mouseX, int mouseY) {
 		float eZ = 300f;
 		float pZ = game.box.height/2;
-		
+
 		float x = game.box.width*(mouseX-width/2f)/(width/2)*(eZ-pZ)/eZ;
 		float y = game.box.depth*(mouseY-height/2f)/(height/2)*(eZ-pZ)/eZ;
-		
-//		float x = clamp(mouseX, 124, 600-124);
-//		float y = clamp(mouseY, 124, 600-124);
 
-//		x = map(x, 124, 600-124, -game.box.width/2, game.box.width/2);
-//		y = map(y, 124, 600-124, -game.box.depth/2, game.box.depth/2);
+		//		float x = clamp(mouseX, 124, 600-124);
+		//		float y = clamp(mouseY, 124, 600-124);
+
+		//		x = map(x, 124, 600-124, -game.box.width/2, game.box.width/2);
+		//		y = map(y, 124, 600-124, -game.box.depth/2, game.box.depth/2);
 
 		return new PVector(x,y);
 	}
-	
+
 	public PVector getGamePos(PVector screenPos) {
 		return getGamePos((int)screenPos.x, (int)screenPos.y);
 	}
+
 	public boolean setImageProcessing(ImageProcessing input){
-		this.imageProc = input;
+		imageProc = input;
 		return true;
 	}
-	
+
 }
