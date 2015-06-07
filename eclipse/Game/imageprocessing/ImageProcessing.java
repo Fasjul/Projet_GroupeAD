@@ -130,13 +130,12 @@ public class ImageProcessing extends PApplet{
 		image(accuImg,0, camera.height);
 		image(backWhite,0,camera.height);
 		image(sobel, 0, camera.height);
-
 		hsb.resize(200, 200);
 		image(hsb,sobel.width,0);
 		//image(BlobD.findConnectedComponents(hsb),0,0);
 
 		hsb = hsbFilter(camera);
-		image(BlobD.findConnectedComponents(hsb),0,0);
+		//image(BlobD.findConnectedComponents(hsb),0,0);
 
 	}
 
@@ -181,9 +180,9 @@ public class ImageProcessing extends PApplet{
 			for(int i =0 ; i<cameras.length;i++){
 				println(i+". "+cameras[i]);
 			}
-			if(cameras.length>26){
-				cam = new Capture(this,cameras[1]);
-				println("Selected : "+cameras[1]);
+			if(cameras.length>=26){
+				cam = new Capture(this,cameras[25]);
+				println("Selected : "+cameras[25]);
 			} else {
 				cam = new Capture(this,cameras[0]);
 			}
