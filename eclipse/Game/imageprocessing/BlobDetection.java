@@ -1,8 +1,8 @@
 package imageprocessing;
 
 import java.awt.Polygon;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 import processing.core.PApplet;
@@ -28,7 +28,7 @@ public class BlobDetection {
 		return quad.contains(x,y);
 	}
 
-	public PImage findConnectedComponents(PImage input){
+	public List<PVector> findConnectedComponents(PImage input){
 
 		int[] labels = new int [input.width*input.height];
 		List<TreeSet<Integer>> labelsEquivalences = new ArrayList<TreeSet<Integer>>();
@@ -90,7 +90,6 @@ public class BlobDetection {
 		}
 		
 		// Second traversal : relabel the pixels by their equivalent class
-		currentLabel = 1;
 		for(int i = 0; i<labels.length; i++){
 			final int l = labels[i];
 			if(l != 0) {
@@ -99,34 +98,34 @@ public class BlobDetection {
 				labels[i] = compVal;
 			}
 		}
+		
+		PVector[] accu = new PVector[currentLabel];
 
-		// Finally, output an image with each blob colored in one uniform color.
-		PImage image = new PImage(input.width, input.height);
-		for(int i = 0; i<labels.length;i++){
+		// Compute the average of equivalent labels
+		for(int i = 0; i<labels.length; i++) {
 			int y = i/input.width;
 			int x = i % input.width;
-			if(labels[i] > 0)
-				image.set(x, y, clr(labels[i]));
+			
+			int l = labels[i];
+			
+			if(accu[l] == null) {
+				accu[l] = new PVector(0, 0, 0);
+			}
+			
+			accu[l].x += x;
+			accu[l].y += y;
+			accu[l].z ++;
 		}
-		return image;
-	}
-	
-	private int clr(int label) {
-		switch(label) {
-		case 1:
-			return applet.color(255, 0, 0);
-		case 2:
-			return applet.color(0, 255, 0);
-		case 3:
-			return applet.color(0, 0, 255);
-		case 4:
-			return applet.color(255, 255, 0);
-		case 5:
-			return applet.color(0, 255, 255);
-		case 6:
-			return applet.color(255, 0, 255);
-		default:
-			return 200*label;
+		
+		// Create average list
+		ArrayList<PVector> list = new ArrayList<>();
+		for(int i = 1; i<currentLabel; i++) {
+			if(accu[i] != null) {
+				list.add(new PVector(accu[i].x/accu[i].z, accu[i].y/accu[i].z));
+			}
 		}
+		
+		return list;
+		
 	}
 }
