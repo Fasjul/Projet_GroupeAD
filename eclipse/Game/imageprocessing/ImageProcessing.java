@@ -66,7 +66,7 @@ public class ImageProcessing extends PApplet{
 	private boolean showQuads = true;
 
 	public PVector boardRotations = new PVector(0,1,0);
-
+	
 	@Override
 	public void setup() {
 		tabInitialization();

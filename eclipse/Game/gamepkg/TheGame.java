@@ -13,7 +13,10 @@ public class TheGame extends PApplet {
 	private static final long serialVersionUID = 1L;
 	private static ImageProcessing imageProc;
 	private static GameApplet game;
-
+	private Minim minim;
+	private AudioPlayer player;
+	private Boolean musicOn = false;
+	
 	@Override
 	public void setup(){
 		// Set multi-container size
@@ -38,9 +41,15 @@ public class TheGame extends PApplet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		// initialize Game frame
 		game.init();
 		game.start();
+		minim = new Minim(this);
+		player = minim.loadFile("resources/ThemeDaft.mp3");
 	}
+	@Override
+	public void draw(){
+		if(musicOn) player.play();
+	}
+	
 }

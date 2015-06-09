@@ -60,7 +60,7 @@ public class GameApplet extends PApplet {
 		// TODO: Create and send Graphics variables here:
 		Box box = new Box(gameGraphics, boxWidth, boxHeight, boxDepth);
 		Mover mover = new Mover(this, gameGraphics, ballRadius);
-		ObstacleManager obstacles = new ObstacleManager(this, gameGraphics, cylinderBaseRadius, cylinderBaseHeight, cylinderResolution);
+		ObstacleManager obstacles = new ObstacleManager(this, gameGraphics, cylinderBaseRadius, cylinderBaseHeight, cylinderResolution,new Minim(this));
 		
 		game = new GameManager(this, gameGraphics, statGraphics, box, mover, obstacles, imageProc);
 		

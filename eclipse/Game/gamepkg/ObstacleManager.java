@@ -16,9 +16,11 @@ public class ObstacleManager implements Drawable {
 
 	public final GameApplet GAME;
 	public final PGraphics GAMEGFX;
+	private Minim minim;
+	private AudioPlayer playerBlop;
+	private AudioPlayer playerBreak;
 	
-	
-	public ObstacleManager(GameApplet game, PGraphics gameGraphics, float baseHeight, float baseRadius, int baseResolution) {
+	public ObstacleManager(GameApplet game, PGraphics gameGraphics, float baseHeight, float baseRadius, int baseResolution, Minim minArg) {
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
 
@@ -31,6 +33,9 @@ public class ObstacleManager implements Drawable {
 		ghost = new ClosedCylinder(GAME, GAMEGFX, new PVector(0,0), BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
 		ghost.setGhost(true);
 		
+		minim = minArg;
+		playerBreak = minim.loadFile("resources/Glass_Break.mp3");
+		playerBlop = minim.loadFile("resources/Blop.mp3");
 	}
 
 	public ClosedCylinder add(ClosedCylinder obstacle) {
@@ -41,6 +46,8 @@ public class ObstacleManager implements Drawable {
 	public ClosedCylinder add(PVector position) {
 		ClosedCylinder cyl = new ClosedCylinder(GAME, GAMEGFX, position, BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
 		obstacleList.add(cyl);
+		playerBlop.play();
+		playerBlop.rewind();
 		return cyl;
 	}
 
@@ -55,9 +62,8 @@ public class ObstacleManager implements Drawable {
 	}
 	public void destroy(ClosedCylinder c){
 		if(contains(c)){
-			Minim minim = new Minim(this);
-			AudioPlayer player = minim.loadFile("Glass_Break.mp3");
-			player.play();
+			playerBreak.play();
+			playerBreak.rewind();
 			remove(c);
 		}
 	}
