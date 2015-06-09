@@ -9,18 +9,14 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 
-/**
- * Allows detection of connected components (in terms of computer vision) on a surface
- * delimited by a Quad. These are named "blobs".
- */
 public class BlobDetection {
 	private final PApplet applet;
-	private Polygon quad;
+	
+	private Polygon quad = new Polygon();
 
 	public BlobDetection(PApplet applet, PVector c1, PVector c2, PVector c3, PVector c4){
 		this.applet = applet;
 		
-		quad = new Polygon();
 		quad.addPoint((int) c1.x, (int) c1.y);
 		quad.addPoint((int) c2.x, (int) c2.y);
 		quad.addPoint((int) c3.x, (int) c3.y);
@@ -28,21 +24,10 @@ public class BlobDetection {
 
 	}
 
-	/**
-	 * Returns true if coordinate is inside the plane given in the constructor.
-	 * @param x abscissa of the point
-	 * @param y ordinate of the point
-	 * @return <b>true</b> if it is inside the plane, <b>false</b> otherwise.
-	 */
 	public boolean isInQuad(int x, int y){
 		return quad.contains(x,y);
 	}
 
-	/**
-	 * Finds all connected components in a image given.
-	 * @param input PImage to check for blobs
-	 * @return A list of coordinates of the different blob centers.
-	 */
 	public List<PVector> findConnectedComponents(PImage input){
 
 		int[] labels = new int [input.width*input.height];
@@ -56,9 +41,6 @@ public class BlobDetection {
 				// Check labels around
 				int y = (int)(p/input.width);
 				int x = p % input.width;
-				
-				if(!isInQuad(x, y))
-					continue;
 
 				// Cell neighbors
 				int[] nghbrs = new int[] { 

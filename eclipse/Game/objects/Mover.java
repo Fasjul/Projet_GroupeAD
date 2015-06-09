@@ -92,8 +92,7 @@ public class Mover {
 
 	public void checkCylinderCollision(ObstacleManager obstacles){
 		for(ClosedCylinder cyl : obstacles.obstacleList){
-			if(cyl.collisionWithMover(this)){
-
+				
 				PVector normal = new PVector(cyl.location.x - this.location.x, cyl.location.y - this.location.y);
 
 				PVector n = normal.get();
@@ -106,11 +105,12 @@ public class Mover {
 				normal.mult(2);
 				velocity.sub(normal);
 
-				float mag = velocity.mag();
-				if(mag >= SCORE_MIN) {
-					lastScore = mag * SCORE_RATIO;
-					totalScore += lastScore;		
-				}
+				if(cyl.collisionWithMover(this)){
+					float mag = velocity.mag();
+					if(mag >= SCORE_MIN) {
+						lastScore = mag * SCORE_RATIO;
+						totalScore += lastScore;		
+					}
 			}
 		}
 	}

@@ -14,5 +14,10 @@
 	<classpathentry kind="lib" path="lib/video.jar"/>
 	<classpathentry kind="lib" path="lib/papaya.jar"/>
 	<classpathentry kind="lib" path="lib/minim.jar"/>
+	<classpathentry kind="lib" path="lib/jsminim.jar"/>
+	<classpathentry kind="lib" path="lib/mp3spi1.9.4.jar"/>
+	<classpathentry kind="lib" path="lib/tritonus_aos.jar"/>
+	<classpathentry kind="lib" path="lib/tritonus_share.jar"/>
+	<classpathentry kind="lib" path="resources/jl1.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

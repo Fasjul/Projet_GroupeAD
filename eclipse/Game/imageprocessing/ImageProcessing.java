@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -88,6 +90,7 @@ public class ImageProcessing extends PApplet{
 		boardRotations = new PVector(0,0,0);
 		returnedCorners = new ArrayList<PVector>();
 		accuImg = new PImage(200,200);
+		
 	}
 
 	@Override

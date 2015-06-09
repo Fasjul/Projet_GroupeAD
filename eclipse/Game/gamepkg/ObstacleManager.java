@@ -17,8 +17,6 @@ public class ObstacleManager implements Drawable {
 	public final GameApplet GAME;
 	public final PGraphics GAMEGFX;
 	
-	private Minim minim;
-	private AudioPlayer player;
 	
 	public ObstacleManager(GameApplet game, PGraphics gameGraphics, float baseHeight, float baseRadius, int baseResolution) {
 		this.GAME = game;
@@ -33,9 +31,6 @@ public class ObstacleManager implements Drawable {
 		ghost = new ClosedCylinder(GAME, GAMEGFX, new PVector(0,0), BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
 		ghost.setGhost(true);
 		
-		minim = new Minim(this);
-		player = minim.loadFile("Glass_Break.mp3");
-		
 	}
 
 	public ClosedCylinder add(ClosedCylinder obstacle) {
@@ -46,7 +41,6 @@ public class ObstacleManager implements Drawable {
 	public ClosedCylinder add(PVector position) {
 		ClosedCylinder cyl = new ClosedCylinder(GAME, GAMEGFX, position, BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
 		obstacleList.add(cyl);
-		player.play();
 		return cyl;
 	}
 

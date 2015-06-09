@@ -1,5 +1,7 @@
 package gamepkg;
 
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
 import imageprocessing.ImageProcessing;
 import processing.core.*;
 import processing.event.*;
@@ -29,6 +31,9 @@ public class GameApplet extends PApplet {
 	 * Mouse scroll amount (between -100 and 100)
 	 */
 	private int mouseScroll = 0;
+	
+	Minim minim ;
+	AudioPlayer player;
 
 	public void setup() {
 
@@ -51,13 +56,14 @@ public class GameApplet extends PApplet {
 		final int cylinderBaseRadius = 30;
 		final int cylinderBaseHeight = 30;
 		final int cylinderResolution = 40;
-
+		//
 		// TODO: Create and send Graphics variables here:
 		Box box = new Box(gameGraphics, boxWidth, boxHeight, boxDepth);
 		Mover mover = new Mover(this, gameGraphics, ballRadius);
 		ObstacleManager obstacles = new ObstacleManager(this, gameGraphics, cylinderBaseRadius, cylinderBaseHeight, cylinderResolution);
-
+		
 		game = new GameManager(this, gameGraphics, statGraphics, box, mover, obstacles, imageProc);
+		
 
 	}
 
