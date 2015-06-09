@@ -24,10 +24,8 @@ public class GameManager {
 	public float rotX = 0f;
 	/** Current y-rotation of the game plane. */
 	public float rotY = 0f;
-	/**
-	 * Current z-rotation of the game plane.
-	 */
-	public float rotZ = 0f;//ImageProcessing.boardRotations.z;
+	/** Current z-rotation of the game plane.  */
+	public float rotZ = 0f;
 
 	private PVector oldPos;
 	private LinkedList<ClosedCylinder> oldObstacles;
@@ -54,6 +52,16 @@ public class GameManager {
 	float speed = 1f;
 	boolean hold = false;
 
+	/**
+	 * Instantiates a new Game Manager which holds all game-specific variables.
+	 * @param game Game Applet
+	 * @param gameGraphics Game Graphics Context
+	 * @param statGraphics Game data-visualization Graphics Context
+	 * @param box Plane which represents the Game surface
+	 * @param mover Sphere which represents the Ball
+	 * @param obstacles Obstacle Manager
+	 * @param input ImageProcessing input for moving the plane
+	 */
 	GameManager(GameApplet game, PGraphics gameGraphics, PGraphics statGraphics, Box box, Mover mover, ObstacleManager obstacles, ImageProcessing input) {
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
@@ -75,11 +83,17 @@ public class GameManager {
 		this.obstacles = obstacles;
 	}
 
+	/**
+	 * Call to draw all objects into the Graphics Contexts
+	 */
 	public void draw() {
 		drawGame();
 		drawStats();
 	}
 
+	/**
+	 * Updates the rotation values.
+	 */
 	private void updateRot(){
 		float diffX = Math.abs(rotX-input.boardRotations.x);
 		float diffY = Math.abs(rotY-input.boardRotations.y);
@@ -91,53 +105,59 @@ public class GameManager {
 		System.out.println("old : "+rotX+", new : "+input.boardRotations.x+" , Diff = "+diffX);		
 	}
 
+	/**
+	 * Draws the game into the graphics context
+	 */
 	private void drawGame() {
-		GAMEGFX.pushMatrix();
 		GAMEGFX.beginDraw();
+		
+		// Normal gameplay mode
 		if(hold==false) {
 			GAMEGFX.background(255);
 			GAMEGFX.camera(0, -150, 600, 0, 0, 0, 0, 1, 0);
 			GAMEGFX.pushMatrix();
-			GAMEGFX.translate(0, -300, 0);
-			GAMEGFX.directionalLight(255, 255, 255, 0, 1, 0);
-			GAMEGFX.ambientLight(100,100,100);
+				GAMEGFX.translate(0, -300, 0);
+				GAMEGFX.directionalLight(255, 255, 255, 0, 1, 0);
+				GAMEGFX.ambientLight(100,100,100);
 			GAMEGFX.popMatrix();
 
 			GAMEGFX.pushMatrix();
-			updateRot();
-			GAMEGFX.rotateY(GAME.game.rotY);
-			GAMEGFX.rotateX(GAME.game.rotX);
-			GAMEGFX.rotateZ(GAME.game.rotZ);
-
-
-			GAMEGFX.fill(80, 80, 80);
-
-			box.draw();
-			obstacles.draw();
-
-			GAMEGFX.pushMatrix();
-			GAMEGFX.translate(mover.location.x, -box.height/2-mover.radius, mover.location.y);
-			mover.update();
-			mover.checkEdges();
-			mover.checkCylinderCollision(obstacles);
-			mover.draw();
+				updateRot();
+				GAMEGFX.rotateY(GAME.game.rotY);
+				GAMEGFX.rotateX(GAME.game.rotX);
+				GAMEGFX.rotateZ(GAME.game.rotZ);
+	
+	
+				GAMEGFX.fill(80, 80, 80);
+	
+				box.draw();
+				obstacles.draw();
+	
+				GAMEGFX.pushMatrix();
+					GAMEGFX.translate(mover.location.x, -box.height/2-mover.radius, mover.location.y);
+					mover.update();
+					mover.checkEdges();
+					mover.checkCylinderCollision(obstacles);
+					mover.draw();
+				GAMEGFX.popMatrix();
 			GAMEGFX.popMatrix();
-			GAMEGFX.popMatrix();
+		
+		// Obstacle add mode
 		} else {
 			GAMEGFX.background(200);
 			GAMEGFX.camera(0,-600, 1, 0, 0, 0, 0, 1, 0);
 
 			GAMEGFX.pushMatrix();
-			GAMEGFX.directionalLight(102,102,102,102,102,102);
-			GAMEGFX.ambientLight(100,100,100);
-
-			GAMEGFX.noStroke();
-			GAMEGFX.fill(80,80,80);
-			box.draw();
-			obstacles.draw();
-
-			GAMEGFX.translate(mover.location.x, -20, mover.location.y);
-			mover.draw();
+				GAMEGFX.directionalLight(102,102,102,102,102,102);
+				GAMEGFX.ambientLight(100,100,100);
+	
+				GAMEGFX.noStroke();
+				GAMEGFX.fill(80,80,80);
+				box.draw();
+				obstacles.draw();
+	
+				GAMEGFX.translate(mover.location.x, -20, mover.location.y);
+				mover.draw();
 			GAMEGFX.popMatrix();
 
 			ClosedCylinder ghost = GAME.game.obstacles.ghost;
@@ -151,10 +171,12 @@ public class GameManager {
 			GAMEGFX.noStroke();
 		}
 		GAMEGFX.endDraw();
-		GAME.image(GAMEGFX, 0, 0);
-		GAMEGFX.popMatrix();
+		GAME.image(GAMEGFX, 0, 0); // Draw graphics context into applet
 	}
 
+	/**
+	 * Draws the data-visualization part into its context.
+	 */
 	private void drawStats() {
 		STATGFX.beginDraw();
 		STATGFX.background(statBgColor);
@@ -175,9 +197,12 @@ public class GameManager {
 		updateBarChart();
 		STATGFX.image(barChart, statSpacing+topView.width+statSpacing+scoreBoard.width+statSpacing, statSpacing);
 		STATGFX.endDraw();
-		GAME.image(STATGFX, 0, 600);
+		GAME.image(STATGFX, 0, 600); // Draw graphics context into applet
 	}
 
+	/**
+	 * Initialises the top-view context inside of the data-visualization context.
+	 */
 	private void initTopView() {
 		topView.beginDraw();
 		topView.noStroke();
@@ -186,6 +211,9 @@ public class GameManager {
 		topView.endDraw();
 	}
 
+	/**
+	 * Updates the top-view context inside of the data-visualization context.
+	 */
 	private void updateTopView() {
 		topView.beginDraw();
 		topView.noStroke();
@@ -225,6 +253,9 @@ public class GameManager {
 		topView.endDraw();
 	}
 
+	/**
+	 * Updates the scoreboard context inside of the data-visualization context.
+	 */
 	private void updateScoreBoard() {
 		scoreBoard.beginDraw();
 		scoreBoard.stroke(100);
@@ -245,6 +276,9 @@ public class GameManager {
 		scoreBoard.endDraw();
 	}
 
+	/**
+	 * TODO: Updates the bar-chart of the amount of points over time.
+	 */
 	private void updateBarChart() {
 		barChart.beginDraw();
 		barChart.background(statBgColor);

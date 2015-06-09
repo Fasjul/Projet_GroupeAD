@@ -1,4 +1,4 @@
-package imageprocessing;
+package test;
 
 import java.util.List;
 
@@ -6,6 +6,11 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 
+import imageprocessing.BlobDetection;
+
+/**
+ * Quick little class which tests the correct function of the blob detection algorithm.
+ */
 public class BlobDetectionTester extends PApplet {
 	
 	/**
@@ -16,6 +21,9 @@ public class BlobDetectionTester extends PApplet {
 	private PImage img;
 	private BlobDetection blob;
 	
+	/**
+	 * Loads up an image, displays it and its blob centers.
+	 */
 	public void setup() {
 		size(200, 200);
 		
@@ -32,6 +40,11 @@ public class BlobDetectionTester extends PApplet {
 		}
 	}
 	
+	/**
+	 * Method to draw a cross
+	 * @param x abscissa of the cross center
+	 * @param y ordinate of the cross center
+	 */
 	public void drawCross(float x, float y) {
 		stroke(color(255, 0, 0));
 		line(x-2, y, x+2, y);
