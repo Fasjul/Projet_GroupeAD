@@ -58,22 +58,25 @@ public class BlobDetection {
 					int cy = nghbrs[i+1];
 					
 					if(cx < 0 || cy < 0) {
-						values[i >> 1] = 0;
+						values[i/2] = 0;
 					} else {
-						values[i >> 1] = labels[cx + input.width*cy];
+						values[i/2] = labels[cx + input.width*cy];
 					}
 				}
 
 				// Get minimum label of neighbors
 				int minLabel = Integer.MAX_VALUE;
+				boolean found = false;
+				
 				for(int i=0; i<values.length; i++) {
 					if(values[i] != 0 && values[i] < minLabel) {
 						minLabel = values[i];
+						found = true;
 					}
 				}
 
 				// Check if new label needed
-				if(currentLabel < minLabel) {
+				if(!found) {
 					labels[p] = currentLabel++;
 					labelsEquivalences.add(new TreeSet<Integer>());
 				} else {
@@ -81,6 +84,7 @@ public class BlobDetection {
 					for(int z = 0; z<values.length; z++){
 						if(values[z] != 0){
 							labelsEquivalences.get(values[z]-1).add(minLabel);
+							labelsEquivalences.get(minLabel-1).add(values[z]);
 						}
 					}
 				}

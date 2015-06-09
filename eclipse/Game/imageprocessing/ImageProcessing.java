@@ -120,11 +120,11 @@ public class ImageProcessing extends PApplet{
 				boardRotations.set(rotations);
 			}
 		}
-		BlobDetection BlobD;
+		BlobDetection blobD;
 		if(returnedCorners.size()>=4){
-			BlobD = new BlobDetection(this,returnedCorners.get(0),returnedCorners.get(1),returnedCorners.get(2),returnedCorners.get(3));
+			blobD = new BlobDetection(this,returnedCorners.get(0),returnedCorners.get(1),returnedCorners.get(2),returnedCorners.get(3));
 		}else{
-			BlobD = new BlobDetection(this,new PVector(0,0),new PVector(0,0),new PVector(0,0),new PVector(0,0));
+			blobD = new BlobDetection(this,new PVector(0,0),new PVector(0,0),new PVector(0,0),new PVector(0,0));
 		}
 		backWhite.resize(sobel.width+2, sobel.height+2);
 		image(camera, 0, 0);
