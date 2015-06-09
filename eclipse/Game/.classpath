@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/video.jar"/>
 	<classpathentry kind="lib" path="lib/papaya.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Simon/Documents/EPFL/Software/Processing/processing-2.2.1/core/library/minim.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

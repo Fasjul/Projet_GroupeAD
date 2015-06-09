@@ -21,6 +21,7 @@ public class ImageProcessing extends PApplet{
 
 	private PImage camera, sobel, image, accuImg,hsb;
 	private Capture cam;
+	private ArrayList<PVector> returnedCorners;
 	
 	// Hough Values
 	float discretizationStepPhi = 0.006f;
@@ -85,6 +86,8 @@ public class ImageProcessing extends PApplet{
 
 		}
 		boardRotations = new PVector(0,0,0);
+		returnedCorners = new ArrayList<PVector>();
+		accuImg = new PImage(200,200);
 	}
 
 	@Override
@@ -103,15 +106,13 @@ public class ImageProcessing extends PApplet{
 		camera = cam.get();
 		sobel = applyAll(camera);
 		hsb = hsbFilter(camera);
-
-		ArrayList<PVector> returnedCorners = hough(sobel, 4, tabCos, tabSin);
 		if(sobel.height>0 && sobel.width>0) initialized = true;
 		else initialized = false;
 		if(!initialized){
 			sobel = new PImage(200,200);
 			hsb = new PImage(200,200);
 		}else{
-			sobel.resize(sobel.width/2,sobel.height/2);
+			//sobel.resize(sobel.width/2,sobel.height/2);
 			hsb.resize(sobel.width, sobel.height);
 			TwoDThreeD dd = new TwoDThreeD(camera.width,camera.height);
 			if(returnedCorners.size()!=0){
@@ -132,6 +133,8 @@ public class ImageProcessing extends PApplet{
 		image(sobel, 0, camera.height);
 		hsb.resize(200, 200);
 		image(hsb,sobel.width,0);
+		returnedCorners = hough(sobel, 4, tabCos, tabSin);
+		
 		//image(BlobD.findConnectedComponents(hsb),0,0);
 
 		hsb = hsbFilter(camera);

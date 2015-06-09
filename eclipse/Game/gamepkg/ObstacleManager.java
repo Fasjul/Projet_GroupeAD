@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import objects.*;
 import processing.core.*;
+import ddf.minim.*;
+import ddf.minim.spi.AudioRecordingStream;
 
 public class ObstacleManager implements Drawable {
 	public final ArrayList<ClosedCylinder> obstacleList;
@@ -46,9 +48,17 @@ public class ObstacleManager implements Drawable {
 	}
 
 	public void remove(ClosedCylinder c){
-		/*if(contains(c)){
+		if(contains(c)){
 			obstacleList.remove(c);
-		}*/
+		}
+	}
+	public void destroy(ClosedCylinder c){
+		if(contains(c)){
+			Minim minim = new Minim(this);
+			AudioPlayer player = minim.loadFile("Glass_Break.mp3");
+			player.play();
+			remove(c);
+		}
 	}
 
 	public void draw() {
