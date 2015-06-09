@@ -55,7 +55,7 @@ public class ClosedCylinder implements Drawable {
 		return squareDist <= squareRadius;
 	}
 
-	public boolean collisionWithCylinder(ClosedCylinder that){
+	public boolean collisionWith(ClosedCylinder that){
 		float distX = (that.location.x - this.location.x);
 		float distY = (that.location.y - this.location.y);
 		float squareDist = distX*distX + distY*distY;

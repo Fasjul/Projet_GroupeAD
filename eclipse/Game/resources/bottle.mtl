@@ -1,0 +1,62 @@
+# Blender MTL File: 'bottle.blend'
+# Material Count: 6
+
+newmtl Material
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Capsule.png
+
+newmtl Verre_vert
+Ns 498.039216
+Ka 0.000000 0.000000 0.000000
+Kd 0.002174 0.267459 0.000000
+Ks 0.844156 0.844156 0.844156
+Ni 3.000000
+d 1.000000
+illum 2
+map_Kd bouteille_Bas_Fin.jpg
+
+newmtl Verre_vert_Bas_fin
+Ns 498.039216
+Ka 0.000000 0.000000 0.000000
+Kd 0.002174 0.267459 0.000000
+Ks 0.844156 0.844156 0.844156
+Ni 3.000000
+d 1.000000
+illum 2
+map_Kd bouteille_Bas_Fin.jpg
+
+newmtl Verre_vert_BouteilleHaut
+Ns 498.039216
+Ka 0.000000 0.000000 0.000000
+Kd 0.002174 0.267459 0.000000
+Ks 0.844156 0.844156 0.844156
+Ni 3.000000
+d 1.000000
+illum 2
+map_Kd bouteille_Bas_Fin.jpg
+
+newmtl Verre_vert_Material_Diffuse_Color
+Ns 498.039216
+Ka 0.000000 0.000000 0.000000
+Kd 0.002174 0.267459 0.000000
+Ks 0.844156 0.844156 0.844156
+Ni 3.000000
+d 1.000000
+illum 2
+map_Kd Capsule.png
+
+newmtl Verre_vert_NONE
+Ns 498.039216
+Ka 0.000000 0.000000 0.000000
+Kd 0.002174 0.267459 0.000000
+Ks 0.844156 0.844156 0.844156
+Ni 3.000000
+d 1.000000
+illum 2
+map_Kd bouteille_Bas_Fin.jpg

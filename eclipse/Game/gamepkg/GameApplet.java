@@ -124,10 +124,10 @@ public class GameApplet extends PApplet {
 	 * Adds a cylinder to the game when the mouse is clicked.
 	 */
 	public void mouseClicked(){
-		ClosedCylinder ghost = game.obstacles.ghost;
+		Bottle ghost = game.obstacles.ghost;
 		if(game.hold && (!ghost.collisionWithMover(game.mover))) {
 			if(mouseButton == LEFT) {
-				ClosedCylinder toAdd = game.obstacles.add(getGamePos(mouseX, mouseY));
+				Bottle toAdd = game.obstacles.add(getGamePos(mouseX, mouseY));
 				toAdd.setColor(255, 255, 51);
 
 			} else if(mouseButton == RIGHT) {

@@ -31,7 +31,7 @@ public class GameManager {
 	public float rotZ = 0f;//ImageProcessing.boardRotations.z;
 
 	private PVector oldPos;
-	private LinkedList<ClosedCylinder> oldObstacles;
+	private LinkedList<Bottle> oldObstacles;
 
 	/** Processing Applet Variable. */
 	public final GameApplet GAME;
@@ -119,7 +119,7 @@ public class GameManager {
 			GAMEGFX.translate(mover.location.x, -box.height/2-mover.radius, mover.location.y);
 			mover.update();
 			mover.checkEdges();
-			mover.checkCylinderCollision(obstacles);
+			mover.checkCollision(obstacles);
 			mover.draw();
 			GAMEGFX.popMatrix();
 			GAMEGFX.popMatrix();
@@ -140,7 +140,7 @@ public class GameManager {
 			mover.draw();
 			GAMEGFX.popMatrix();
 
-			ClosedCylinder ghost = GAME.game.obstacles.ghost;
+			Bottle ghost = GAME.game.obstacles.ghost;
 
 			ghost.move(GAME.getGamePos(GAME.mouseX, GAME.mouseY));
 			if(ghost.collisionWithMover(mover)){
@@ -202,20 +202,20 @@ public class GameManager {
 		topView.fill(255, 0, 0);
 		topView.ellipse(relativePos.x, relativePos.y, relativeSize, relativeSize);
 
-		for(ClosedCylinder c : oldObstacles) {
+		for(Bottle c : oldObstacles) {
 			topView.fill(100, 100, 255);
 			float radius = 2*c.radius/factor + 1;
 			topView.ellipse(c.location.x/factor, c.location.y/factor, radius, radius);
 		}
 
-		for(ClosedCylinder c : obstacles.obstacleList) {
+		for(Bottle c : obstacles.obstacleList) {
 			topView.fill(255);
 			float radius = 2*c.radius/factor;
 			topView.ellipse(c.location.x/factor, c.location.y/factor, radius, radius);
 		}
 
 		oldObstacles.clear();
-		for(ClosedCylinder c : obstacles.obstacleList) {
+		for(Bottle c : obstacles.obstacleList) {
 			oldObstacles.add(c);
 		}
 

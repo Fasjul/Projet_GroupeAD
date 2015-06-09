@@ -90,9 +90,9 @@ public class Mover {
 		}
 	}
 
-	public void checkCylinderCollision(ObstacleManager obstacles){
-		for(ClosedCylinder cyl : obstacles.obstacleList){
-				
+	public void checkCollision(ObstacleManager obstacles){
+		for(Bottle cyl : obstacles.obstacleList){
+	
 				PVector normal = new PVector(cyl.location.x - this.location.x, cyl.location.y - this.location.y);
 
 				PVector n = normal.get();
