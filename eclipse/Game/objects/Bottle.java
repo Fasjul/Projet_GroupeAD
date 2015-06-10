@@ -32,7 +32,7 @@ public class Bottle implements Drawable{
 		this.GAMEGFX = gameGraphics;
 		this.BOTTLE = GAMEGFX.loadShape("resources/bottle.obj");
 		
-		this.location = new PVector(location.x, location.y);
+		this.location = location;
 		this.radius = BOTTLE.getWidth()/2.0f;
 		this.height = BOTTLE.getHeight();
 		this.resolution = resolution;
@@ -79,12 +79,16 @@ public class Bottle implements Drawable{
 	}
 	
 	public void draw(){
+		GAMEGFX.pushMatrix();
+		GAMEGFX.translate(location.x, -GAME.game.box.height/2, location.y);
+		
 		if(ghost) {
 			GAMEGFX.fill(GAMEGFX.color(255, 255, 224, 100));
 		} else {
 			GAMEGFX.fill(GAMEGFX.color(R, G, B));
 		}
-		GAMEGFX.shape(BOTTLE);
+		GAMEGFX.shape(BOTTLE,0,0);
+		GAMEGFX.popMatrix();
 	}
 
 }
