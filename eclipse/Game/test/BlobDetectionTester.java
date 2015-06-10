@@ -1,4 +1,6 @@
-package imageprocessing;
+package test;
+
+import imageprocessing.BlobDetection;
 
 import java.util.List;
 

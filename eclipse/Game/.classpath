@@ -18,6 +18,6 @@
 	<classpathentry kind="lib" path="lib/mp3spi1.9.4.jar"/>
 	<classpathentry kind="lib" path="lib/tritonus_aos.jar"/>
 	<classpathentry kind="lib" path="lib/tritonus_share.jar"/>
-	<classpathentry kind="lib" path="resources/jl1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jl1.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
