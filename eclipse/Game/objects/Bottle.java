@@ -80,7 +80,7 @@ public class Bottle implements Drawable{
 	
 	public void draw(){
 		GAMEGFX.pushMatrix();
-		GAMEGFX.translate(location.x, -GAME.game.box.height/2, location.y);
+		GAMEGFX.translate(location.x, -GAME.game.box.height, location.y);
 		
 		if(ghost) {
 			GAMEGFX.fill(GAMEGFX.color(255, 255, 224, 100));
