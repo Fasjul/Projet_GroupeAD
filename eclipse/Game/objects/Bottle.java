@@ -39,7 +39,7 @@ public class Bottle implements Drawable{
 	}
 
 	public void move(PVector newLocation){
-		location = new PVector(newLocation.x, newLocation.y);
+		this.location = new PVector(newLocation.x, newLocation.y);
 	}
 
 	public boolean collisionWithMover(Mover mover){

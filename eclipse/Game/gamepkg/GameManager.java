@@ -141,8 +141,9 @@ public class GameManager {
 			GAMEGFX.popMatrix();
 
 			Bottle ghost = GAME.game.obstacles.ghost;
-
-			ghost.move(GAME.getGamePos(GAME.mouseX, GAME.mouseY));
+			
+			ghost.move(GAME.getGamePos(GAME.mouseX-200, GAME.mouseY+100));
+			
 			if(ghost.collisionWithMover(mover)){
 				GAMEGFX.stroke(GAMEGFX.color(230,0,0));
 			}
