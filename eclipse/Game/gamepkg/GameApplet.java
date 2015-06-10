@@ -127,7 +127,7 @@ public class GameApplet extends PApplet {
 		Bottle ghost = game.obstacles.ghost;
 		if(game.hold && (!ghost.collisionWithMover(game.mover))) {
 			if(mouseButton == LEFT) {
-				Bottle toAdd = game.obstacles.add(getGamePos(mouseX, mouseY));
+				Bottle toAdd = game.obstacles.add(ghost.location);
 				toAdd.setColor(255, 255, 51);
 
 			} else if(mouseButton == RIGHT) {
