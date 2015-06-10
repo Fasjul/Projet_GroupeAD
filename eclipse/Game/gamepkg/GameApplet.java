@@ -115,8 +115,8 @@ public class GameApplet extends PApplet {
 		// Save the coordinates of the 
 		// start of the drag.
 		if(!game.hold){
-			mX = mouseX - bX;
-			mY = mouseY - bY;
+			mX = mouseX ;//- bX;
+			mY = mouseY ;//- bY;
 		}
 	}
 
