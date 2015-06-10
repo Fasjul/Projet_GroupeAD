@@ -5,7 +5,7 @@ import ddf.minim.*;
 import imageprocessing.ImageProcessing;
 import processing.core.PApplet;
 
-public class TheGame extends PApplet {
+public class TangibleGame extends PApplet {
 
 	/**
 	 * 
