@@ -174,30 +174,38 @@ public class ImageProcessing extends PApplet{
 		 */
 	}
 
-	public boolean camStart(){
+	public void camStart(){
 		String[] cameras = Capture.list();
+		
 		if(cameras.length == 0){
 			println("There are no camera available for capture.");
-			image = loadImage("resources/boards/board1.jpg");
 			exit();
-			return true;
-		}else{
-			println("Available cameras :");
-			for(int i =0 ; i<cameras.length;i++){
-				println(i+". "+cameras[i]);
+		} else {
+			int selected = -1;
+			for(int i=0; i<cameras.length; i++) {
+				String[] params = cameras[i].split(",");
+				String name = params[0].substring(params[0].indexOf('=')+1);
+				String size = params[1].substring(params[1].indexOf('=')+1);
+				String fps  = params[2].substring(params[2].indexOf('=')+1);
+				
+				if(size.equals("640x480") && fps.equals("30")) {
+					selected = i;
+				}
 			}
-			if(cameras.length>=26){
-				cam = new Capture(this,cameras[25]);
-				println("Selected : "+cameras[25]);
+			
+			if(selected != -1) {
+				cam = new Capture(this, cameras[selected]);
+				println("Camera " + selected + " selected: " + cameras[selected]);
 			} else {
-				cam = new Capture(this,cameras[0]);
+				cam = new Capture(this, cameras[0]);
+				println("No optimal camera found, using first camera: " + cameras[0]);
 			}
+
 			cam.start();
 			if(cam.available()==true){
 				cam.read();
 			}
 			image = cam.get();
-			return true;
 		}
 	}
 
