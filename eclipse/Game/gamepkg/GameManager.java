@@ -85,10 +85,14 @@ public class GameManager {
 		float diffX = Math.abs(rotX-input.boardRotations.x);
 		float diffY = Math.abs(rotY-input.boardRotations.y);
 		float diffZ = Math.abs(rotZ-input.boardRotations.z);
-		//update position only if rotation is not too small or too big
+		/*//update position only if rotation is not too small or too big
 		if(diffX>0.01 && diffX<Math.PI/2) rotX = (input.boardRotations.x);
 		if(diffY>0.01 && diffY<Math.PI/2) rotZ = -input.boardRotations.y;
-		if(diffZ>0.01 && diffZ<Math.PI/2) rotY = input.boardRotations.z;		
+		if(diffZ>0.01 && diffZ<Math.PI/2) rotY = input.boardRotations.z;	*/
+		rotX = (input.boardRotations.x);
+		 rotZ = -input.boardRotations.y;
+		 rotY = input.boardRotations.z;
+		
 	}
 
 	private void drawGame() {
