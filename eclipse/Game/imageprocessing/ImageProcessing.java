@@ -138,9 +138,13 @@ public class ImageProcessing extends PApplet{
 		image(hsb,sobel.width,0);
 		returnedCorners = hough(sobel, 6, tabCos, tabSin);
 		
-		image(hsb,0,0);
+		
+		//hsbFilter for the objects detection
+		PImage redFilter = hsbFilter(camera,0,7,20,240,60);
+		if(redFilter.width>0) redFilter.resize(200, 200);
+		image(redFilter,0,0);
 
-		hsb = hsbFilter(camera);
+		//hsb = hsbFilter(camera);
 		//image(BlobD.findConnectedComponents(hsb),0,0);
 
 	}
@@ -281,12 +285,15 @@ public class ImageProcessing extends PApplet{
 	public PImage hsbFilter(PImage img) {
 		float hueMin =  80f; // hue minimum
 		float hueMax = 140f; // hue maximum
-
 		float bMin =  20f;  // brightness minimum
 		float bMax = 240f;  // brightness maximum
-
 		float sMin = 60f;  // saturation minimum
-
+		
+		return hsbFilter(img,hueMin,hueMax,bMin,bMax,sMin);
+		
+	}
+	
+	public PImage hsbFilter(PImage img, float hueMin, float hueMax, float bMin, float bMax, float sMin){
 		final int width = img.width;
 		final int height = img.height;
 
