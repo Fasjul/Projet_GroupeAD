@@ -138,7 +138,7 @@ public class ImageProcessing extends PApplet{
 		image(hsb,sobel.width,0);
 		returnedCorners = hough(sobel, 6, tabCos, tabSin);
 		
-		//image(BlobD.findConnectedComponents(hsb),0,0);
+		image(hsb,0,0);
 
 		hsb = hsbFilter(camera);
 		//image(BlobD.findConnectedComponents(hsb),0,0);
