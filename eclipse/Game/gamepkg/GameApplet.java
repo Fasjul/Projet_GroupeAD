@@ -1,7 +1,11 @@
 package gamepkg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
+import imageprocessing.BlobDetection;
 import imageprocessing.ImageProcessing;
 import processing.core.*;
 import processing.event.*;
@@ -85,7 +89,9 @@ public class GameApplet extends PApplet {
 	public void keyPressed() {
 		if(key == CODED) {
 			if(keyCode == SHIFT){
-				game.hold = true;
+				game.hold = true;	
+				//Run the blob detection
+				runBlobDetection();
 			}
 		}
 	}
@@ -98,7 +104,24 @@ public class GameApplet extends PApplet {
 		}
 	}
 
-
+	
+	public List<PVector> runBlobDetection(){
+		ArrayList<PVector> corners = imageProc.returnedCorners;
+		List<PVector> obstaclesPos = new ArrayList<PVector>();
+		PImage hsb = imageProc.hsbFilterRed;
+		BlobDetection blobD;
+		
+		if(corners.size()>=4){
+			blobD = new BlobDetection(this,corners.get(0),corners.get(1),corners.get(2),corners.get(3));
+		}else{
+			blobD = new BlobDetection(this,new PVector(0,0),new PVector(0,0),new PVector(0,0),new PVector(0,0));
+		}
+		
+		if(hsb.width>0 && hsb.height>0){
+			obstaclesPos = blobD.findConnectedComponents(hsb);
+		}
+		return obstaclesPos;
+	}
 
 	/*
 	==============================================

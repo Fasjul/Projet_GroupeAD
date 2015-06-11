@@ -23,7 +23,6 @@ public class ImageProcessing extends PApplet{
 
 	private PImage camera, sobel, image, accuImg,hsb;
 	private Capture cam;
-	private ArrayList<PVector> returnedCorners;
 	
 	// Hough Values
 	float discretizationStepPhi = 0.006f;
@@ -65,7 +64,12 @@ public class ImageProcessing extends PApplet{
 	private boolean plotLines = false;
 	private boolean showQuads = true;
 
+	
+	//Public objects
 	public PVector boardRotations = new PVector(0,1,0);
+	public PImage hsbFilterRed = new PImage(0,0);
+	public ArrayList<PVector> returnedCorners;
+	
 	
 	@Override
 	public void setup() {
@@ -123,12 +127,7 @@ public class ImageProcessing extends PApplet{
 				boardRotations.set(rotations);
 			}
 		}
-		BlobDetection blobD;
-		if(returnedCorners.size()>=4){
-			blobD = new BlobDetection(this,returnedCorners.get(0),returnedCorners.get(1),returnedCorners.get(2),returnedCorners.get(3));
-		}else{
-			blobD = new BlobDetection(this,new PVector(0,0),new PVector(0,0),new PVector(0,0),new PVector(0,0));
-		}
+		
 		backWhite.resize(sobel.width+2, sobel.height+2);
 		image(camera, 0, 0);
 		image(accuImg,0, camera.height);
@@ -140,9 +139,7 @@ public class ImageProcessing extends PApplet{
 		
 		
 		//hsbFilter for the objects detection
-		PImage redFilter = hsbFilter(camera,0,7,20,240,60);
-		if(redFilter.width>0) redFilter.resize(200, 200);
-		image(redFilter,0,0);
+		 hsbFilterRed = hsbFilter(camera,0,7,20,240,60);
 
 		//hsb = hsbFilter(camera);
 		//image(BlobD.findConnectedComponents(hsb),0,0);
