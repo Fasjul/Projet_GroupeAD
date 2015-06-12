@@ -91,7 +91,7 @@ public class GameApplet extends PApplet {
 			if(keyCode == SHIFT){
 				game.hold = true;	
 				//Run the blob detection
-				runBlobDetection();
+				game.obstacles.detectedObstacles = runBlobDetection();
 			}
 		}
 	}
@@ -100,6 +100,7 @@ public class GameApplet extends PApplet {
 		if(key == CODED) {
 			if(keyCode == SHIFT) {
 				game.hold = false;
+				game.obstacles.addDetectedToList();
 			}
 		}
 	}

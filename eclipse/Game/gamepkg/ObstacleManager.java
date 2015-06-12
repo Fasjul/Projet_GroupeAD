@@ -1,6 +1,7 @@
 package gamepkg;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import objects.*;
 import processing.core.*;
@@ -8,6 +9,7 @@ import ddf.minim.*;
 
 public class ObstacleManager implements Drawable {
 	public final ArrayList<Bottle> obstacleList;
+	public List<PVector> detectedObstacles;
 	public final Bottle ghost;
 
 	public final float BASE_HEIGHT;
@@ -33,6 +35,8 @@ public class ObstacleManager implements Drawable {
 		ghost = new Bottle(GAME, GAMEGFX, new PVector(0,0), BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
 		ghost.setGhost(true);
 		
+		detectedObstacles = new ArrayList<PVector>();
+		
 		minim = minArg;
 		playerBreak = minim.loadFile("resources/Glass_Break.mp3");
 		playerBlop = minim.loadFile("resources/Blop.mp3");
@@ -40,14 +44,14 @@ public class ObstacleManager implements Drawable {
 
 	public Bottle add(Bottle obstacle) {
 		obstacleList.add(obstacle);
+		playerBlop.play();
+		playerBlop.rewind();
 		return obstacle;
 	}
 
 	public Bottle add(PVector position) {
 		Bottle cyl = new Bottle(GAME, GAMEGFX, position, BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
 		obstacleList.add(cyl);
-		playerBlop.play();
-		playerBlop.rewind();
 		return cyl;
 	}
 
@@ -71,6 +75,16 @@ public class ObstacleManager implements Drawable {
 	public void draw() {
 		for(Bottle obj : obstacleList) {
 			obj.draw();
+		}
+		for(PVector detected : detectedObstacles){
+			Bottle det = new Bottle(GAME, GAMEGFX, detected, BASE_HEIGHT, BASE_HEIGHT, BASE_RESOLUTION);
+			det.draw();
+		}
+	}
+
+	public void addDetectedToList() {
+		for(PVector detected : detectedObstacles){
+			add(detected);
 		}
 	}
 }
