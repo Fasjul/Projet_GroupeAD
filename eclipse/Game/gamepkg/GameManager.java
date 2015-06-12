@@ -146,7 +146,8 @@ public class GameManager {
 
 			Bottle ghost = GAME.game.obstacles.ghost;
 			
-			ghost.move(GAME.getGamePos(GAME.mouseX-200, GAME.mouseY+100));
+			ghost.move(new PVector(GAME.mouseX-640-320+20,GAME.mouseY-240-20-20));
+			System.out.println(GAME.mouseX+","+GAME.mouseY);
 			
 			if(ghost.collisionWithMover(mover)){
 				GAMEGFX.stroke(GAMEGFX.color(230,0,0));
