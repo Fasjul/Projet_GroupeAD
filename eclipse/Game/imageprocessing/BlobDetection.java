@@ -41,6 +41,8 @@ public class BlobDetection {
 				// Check labels around
 				int y = (int)(p/input.width);
 				int x = p % input.width;
+				
+				if(!isInQuad(x,y)) continue;
 
 				// Cell neighbors
 				int[] nghbrs = new int[] { 
@@ -98,8 +100,12 @@ public class BlobDetection {
 			final int l = labels[i];
 			if(l != 0) {
 				TreeSet<Integer> set = labelsEquivalences.get(l-1);
-				int compVal = set.ceiling(0);
-				labels[i] = compVal;
+				Integer compVal = set.ceiling(0);
+				if(compVal == null) {
+					labels[i] = 0;
+				} else {
+					labels[i] = compVal;
+				}
 			}
 		}
 		

@@ -88,7 +88,7 @@ public class GameApplet extends PApplet {
 	 */
 	public void keyPressed() {
 		if(key == CODED) {
-			if(keyCode == SHIFT){
+			if(keyCode == SHIFT) {
 				game.hold = true;	
 				//Run the blob detection
 				game.obstacles.detectedObstacles = runBlobDetection();
@@ -111,10 +111,10 @@ public class GameApplet extends PApplet {
 		List<PVector> obstaclesPos = new ArrayList<PVector>();
 		PImage hsb = imageProc.hsbFilterRed;
 		BlobDetection blobD;
-
 		
 		if(hsb.width>0 && hsb.height>0 && corners.size()>=4){
-			blobD = new BlobDetection(this,corners.get(0),corners.get(1),corners.get(2),corners.get(3));
+			blobD = new BlobDetection(this, corners.get(0), corners.get(1), corners.get(2), corners.get(3));
+//			hsb.resize(640/4, 480/4);
 			obstaclesPos = blobD.findConnectedComponents(hsb);
 		}
 		return obstaclesPos;
@@ -134,7 +134,7 @@ public class GameApplet extends PApplet {
 	public void mousePressed() {
 		// Save the coordinates of the 
 		// start of the drag.
-		if(!game.hold){
+		if(!game.hold) {
 			mX = mouseX ;//- bX;
 			mY = mouseY ;//- bY;
 		}

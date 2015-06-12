@@ -139,10 +139,8 @@ public class ImageProcessing extends PApplet{
 		
 		
 		//hsbFilter for the objects detection
-		 hsbFilterRed = hsbFilter(camera,0,7,20,240,60);
-
-		//hsb = hsbFilter(camera);
-		//image(BlobD.findConnectedComponents(hsb),0,0);
+		hsbFilterRed = hsbFilter(camera,0,10,20,240,60);
+		image(hsbFilterRed, 0, 480);
 
 	}
 
@@ -167,12 +165,6 @@ public class ImageProcessing extends PApplet{
 			//println(rad2Deg(rotations));
 			boardRotations.set(rotations);
 		}
-		/*
-		bar1.display();
-		bar2.display();
-		bar1.update();
-		bar2.update();
-		 */
 	}
 
 	public void camStart(){
