@@ -139,7 +139,7 @@ public class ImageProcessing extends PApplet{
 		
 		
 		//hsbFilter for the objects detection
-		hsbFilterRed = hsbFilter(camera,0,10,20,240,60);
+		hsbFilterRed = hsbFilter(camera,0,20,10,255,30);
 		image(hsbFilterRed, 0, 480);
 
 	}

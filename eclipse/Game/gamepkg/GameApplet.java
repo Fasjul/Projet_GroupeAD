@@ -114,7 +114,6 @@ public class GameApplet extends PApplet {
 		
 		if(hsb.width>0 && hsb.height>0 && corners.size()>=4){
 			blobD = new BlobDetection(this, corners.get(0), corners.get(1), corners.get(2), corners.get(3));
-//			hsb.resize(640/4, 480/4);
 			obstaclesPos = blobD.findConnectedComponents(hsb);
 		}
 		return obstaclesPos;

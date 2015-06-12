@@ -77,12 +77,14 @@ public class ObstacleManager implements Drawable {
 			obj.draw();
 		}
 		for(PVector detected : detectedObstacles){
-			Bottle det = new Bottle(GAME, GAMEGFX, detected, BASE_HEIGHT, BASE_HEIGHT, BASE_RESOLUTION);
+			Bottle det = new Bottle(GAME, GAMEGFX, detected, BASE_RADIUS, BASE_HEIGHT, BASE_RESOLUTION);
 			det.draw();
 		}
 	}
 
 	public void addDetectedToList() {
+		System.out.println("Adding " + detectedObstacles.size() + " elements which were detected!");
+		System.out.println(detectedObstacles);
 		for(PVector detected : detectedObstacles){
 			add(detected);
 		}

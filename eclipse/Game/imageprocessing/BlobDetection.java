@@ -1,20 +1,22 @@
 package imageprocessing;
 
+import gamepkg.GameApplet;
+
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 
 public class BlobDetection {
-	private final PApplet applet;
+	private final GameApplet applet;
 	
 	private Polygon quad = new Polygon();
 
-	public BlobDetection(PApplet applet, PVector c1, PVector c2, PVector c3, PVector c4){
+	public BlobDetection(GameApplet applet, PVector c1, PVector c2, PVector c3, PVector c4){
 		this.applet = applet;
 		
 		quad.addPoint((int) c1.x, (int) c1.y);
@@ -132,6 +134,38 @@ public class BlobDetection {
 		for(int i = 1; i<currentLabel; i++) {
 			if(accu[i] != null) {
 				list.add(new PVector(accu[i].x/accu[i].z, accu[i].y/accu[i].z));
+			}
+		}
+		
+		Rectangle rect = quad.getBounds();
+		
+		for(PVector v : list) {
+			float x = v.x*applet.game.box.width / rect.width;
+			float y = v.y*applet.game.box.height / rect.height;
+			v.x = x;
+			v.y = y;
+		}
+		
+		int elems = list.size();
+		for(int i=0; i<elems; i++) {
+			PVector v = list.get(i);
+			for(int j=0; j<elems;) {
+				PVector v2 = list.get(j);
+				if(i!=j && v.dist(v2) < applet.game.obstacles.BASE_RADIUS) {
+					list.remove(j);
+					elems--;
+				} else {
+					j++;
+				}
+			}
+		}
+		
+		elems = list.size();
+		for(int i=0; i<elems; i++) {
+			PVector v = list.get(i);
+			if(v.x < -applet.game.box.width/2 || v.x > -applet.game.box.width/2 || v.y < -applet.game.box.height/2 || v.y > applet.game.box.height/2) {
+				list.remove(i);
+				elems--;
 			}
 		}
 		
