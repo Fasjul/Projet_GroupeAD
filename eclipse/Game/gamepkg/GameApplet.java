@@ -111,12 +111,7 @@ public class GameApplet extends PApplet {
 		List<PVector> obstaclesPos = new ArrayList<PVector>();
 		PImage hsb = imageProc.hsbFilterRed;
 		BlobDetection blobD;
-		
-		if(corners.size()>=4){
-			blobD = new BlobDetection(this,corners.get(0),corners.get(1),corners.get(2),corners.get(3));
-		}else{
-			blobD = new BlobDetection(this,new PVector(0,0),new PVector(0,0),new PVector(0,0),new PVector(0,0));
-		}
+
 		
 		if(hsb.width>0 && hsb.height>0 && corners.size()>=4){
 			blobD = new BlobDetection(this,corners.get(0),corners.get(1),corners.get(2),corners.get(3));
