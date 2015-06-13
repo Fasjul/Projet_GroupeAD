@@ -101,7 +101,7 @@ public class ImageProcessing extends PApplet{
 		boardRotations = new PVector(0,0,0);
 		returnedCorners = new ArrayList<PVector>();
 		accuImg = new PImage(200,200);
-		
+		//frameRate(1);
 	}
 	
 	void movieEvent(Movie m){
@@ -149,7 +149,7 @@ public class ImageProcessing extends PApplet{
 		image(sobel, 0, camera.height);
 		hsb.resize(200, 200);
 		image(hsb,sobel.width,0);
-		returnedCorners = hough(sobel, 6, tabCos, tabSin);
+		returnedCorners = hough(sobel, 5, tabCos, tabSin);
 		
 		
 		//hsbFilter for the objects detection
@@ -606,7 +606,7 @@ public class ImageProcessing extends PApplet{
 			PVector c3 = new PVector(c34.x,c34.y);
 			PVector c4 = new PVector(c41.x,c41.y);
 
-			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 800) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
+			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 200000 , 8000) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
 				// Draw options
 				if(showQuads){
 					/*

@@ -10,7 +10,7 @@ public class QuadGraph {
 
 	List<int[]> cycles = new ArrayList<int[]>();
 	int[][] graph;
-	private static boolean debug = true;
+	private static boolean debug = false;
 
 	public void build(List<PVector> lines, int width, int height) {
 
@@ -267,6 +267,7 @@ public class QuadGraph {
 		float area = Math.abs(0.5f * (i1 + i2 + i3 + i4));
 
 		if(debug)System.out.println(area);
+		System.out.println(area);
 
 		boolean valid = (area < max_area && area > min_area);
 
@@ -283,7 +284,7 @@ public class QuadGraph {
 		// cos(70deg) ~= 0.3
 		// cos(60deg) = 0.5
 		// cos(30deg) ~= 0.154
-		float min_cos = 0.154f;
+		float min_cos = 0.8f;
 
 		PVector v21= PVector.sub(c1, c2);
 		PVector v32= PVector.sub(c2, c3);
