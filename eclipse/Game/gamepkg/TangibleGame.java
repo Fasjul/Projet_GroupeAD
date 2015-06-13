@@ -4,7 +4,6 @@ package gamepkg;
 import ddf.minim.*;
 import imageprocessing.ImageProcessing;
 import processing.core.PApplet;
-import processing.core.PImage;
 
 public class TangibleGame extends PApplet {
 	/**

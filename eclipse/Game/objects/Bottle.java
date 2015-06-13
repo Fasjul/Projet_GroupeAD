@@ -1,8 +1,6 @@
 package objects;
 
 import gamepkg.GameApplet;
-import processing.core.PApplet;
-import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PShape;
 import processing.core.PVector;
