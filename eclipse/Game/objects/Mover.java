@@ -87,8 +87,13 @@ public class Mover {
 		}
 		
 		if(collision && mag>=SCORE_MIN) {
-			lastScore = -mag * SCORE_RATIO;
-			totalScore += lastScore;
+			float lastScore = -mag * SCORE_RATIO;
+			float totalScore = this.totalScore + lastScore;
+			
+			if(totalScore >= 0) {
+				this.lastScore = 0;
+				this.totalScore = totalScore;
+			}
 		}
 	}
 
@@ -98,7 +103,7 @@ public class Mover {
 		
 		for(Bottle cyl : obstacles.obstacleList){
 			if(cyl.collisionWithMover(this)){
-				/*
+				/* Disable because no bumps, just destroy
 				PVector normal = new PVector(cyl.location.x - this.location.x, cyl.location.y - this.location.y);
 
 				PVector n = normal.get();

@@ -39,8 +39,8 @@ public class BasicImageProcessing extends PApplet {
 
 	@Override
 	public void mousePressed() {
-		bar1.update();
-		bar2.update();
+		bar1.update(mouseX, mouseY);
+		bar2.update(mouseX, mouseY);
 	}
 
 	@Override
@@ -50,14 +50,14 @@ public class BasicImageProcessing extends PApplet {
 
 	@Override
 	public void mouseMoved() {
-		bar1.update();
-		bar2.update();
+		bar1.update(mouseX, mouseY);
+		bar2.update(mouseX, mouseY);
 	}
 
 	@Override
 	public void mouseDragged() {
-		bar1.update();
-		bar2.update();
+		bar1.update(mouseX, mouseY);
+		bar2.update(mouseX, mouseY);
 	}
 
 	public PImage sobel(PImage img) {

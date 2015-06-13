@@ -5,6 +5,7 @@ import imageprocessing.ImageProcessing;
 import java.util.LinkedList;
 
 import objects.*;
+import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PVector;
 
@@ -38,6 +39,7 @@ public class GameManager {
 	public final PGraphics GAMEGFX;
 	/** Data visualisation variable. */
 	public final PGraphics STATGFX;
+	
 	// Internal variables to the data visualisation
 	/** Top View Graphics */
 	private final PGraphics topView;
@@ -45,29 +47,44 @@ public class GameManager {
 	private final PGraphics scoreBoard;
 	/** Bar chart of WHAT? */
 	private final PGraphics barChart;
+	/** Points over time stored in this list (each entry corresponds to a refresh duration) */
+	private LinkedList<Float> pot;
+	/** Refresh rate of the bar chart (as to each how many frames to update) */
+	private final int refreshRate;
+	/** Max recorded score for displaying */
+	private float maxScore;
 	// Internal variables for the style of the data visualisation
 	private int statBgColor;
 	private int statSpacing;
+	private int statBarWidth;
+	private int statBarSpacing;
 
 	private final ImageProcessing input;
 
-	float speed = 1f;
 	boolean hold = false;
 
 	GameManager(GameApplet game, PGraphics gameGraphics, PGraphics statGraphics, Box box, Mover mover, ObstacleManager obstacles, ImageProcessing input) {
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
 		this.STATGFX = statGraphics;
+		
+		refreshRate = 60;
 
 		statBgColor = STATGFX.color(200);
 		statSpacing = 5;
+		statBarWidth = 3;
+		statBarSpacing = 1;
+		
 		oldObstacles = new LinkedList<>();
+		
 		topView = GAME.createGraphics(100, 100);
 		initTopView();
 
-
 		scoreBoard = GAME.createGraphics(80, 100);
-		barChart = GAME.createGraphics(GAMEGFX.width - 200, 80);
+		
+		maxScore = 1;
+		pot = new LinkedList<>();
+		barChart = GAME.createGraphics(340, 80);
 
 		this.input = input;
 		this.box = box;
@@ -89,9 +106,9 @@ public class GameManager {
 		if(diffX>0.01 && diffX<Math.PI/2) rotX = (input.boardRotations.x);
 		if(diffY>0.01 && diffY<Math.PI/2) rotZ = -input.boardRotations.y;
 		if(diffZ>0.01 && diffZ<Math.PI/2) rotY = input.boardRotations.z;	*/
-		rotX = (input.boardRotations.x);
-		 rotZ = -input.boardRotations.y;
-		 rotY = input.boardRotations.z;
+		rotX = input.boardRotations.x;
+		rotZ = -input.boardRotations.y;
+		rotY = input.boardRotations.z;
 		
 	}
 
@@ -251,11 +268,28 @@ public class GameManager {
 	}
 
 	private void updateBarChart() {
+		if(GAME.frame() % refreshRate == 0) {
+			float score = mover.totalScore;
+			if(score > maxScore) {
+				maxScore = score;
+			}
+			pot.add(score);
+			drawBarChart();
+		}
+	}
+	
+	private void drawBarChart() {
+		barChart.rectMode(PConstants.CORNER);
 		barChart.beginDraw();
-		barChart.background(statBgColor);
-
-		int t = GAME.frame()/3;
-		barChart.line(t, barChart.height, t, barChart.height-mover.totalScore/5);
+			barChart.background(statBgColor);
+			barChart.noStroke();
+			barChart.fill(50, 50, 200);
+			
+			int i = 0;
+			for(Float f : pot) {
+				float calc = f/maxScore*80;
+				barChart.rect((i++) * (statBarWidth+statBarSpacing), barChart.height-calc-1, statBarWidth, calc);
+			}
 		barChart.endDraw();
 	}
 

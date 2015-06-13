@@ -6,11 +6,11 @@ import imageprocessing.ImageProcessing;
 import processing.core.PApplet;
 
 public class TangibleGame extends PApplet {
-
 	/**
-	 * 
+	 * Generated serial version ID
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -869037209221970246L;
+	
 	private static ImageProcessing imageProc;
 	private static GameApplet game;
 	private Minim minim;
@@ -20,7 +20,7 @@ public class TangibleGame extends PApplet {
 	@Override
 	public void setup(){
 		// Set multi-container size
-		size(1175,1190);
+		size(1190,2*480);
 
 		// Create Sub-Applets
 		imageProc = new ImageProcessing();

@@ -45,8 +45,8 @@ public class HScrollbar {
 	/**
 	 * @brief Updates the state of the scrollbar according to the mouse movement
 	 */
-	public void update() {
-		if (isMouseOver()) {
+	public void update(int mouseX, int mouseY) {
+		if (isMouseOver(mouseX, mouseY)) {
 			mouseOver = true;
 		} else {
 			mouseOver = false;
@@ -58,7 +58,7 @@ public class HScrollbar {
 			locked = false;
 		}
 		if (locked) {
-			newSliderPosition = constrain(parent.mouseX - barHeight / 2,
+			newSliderPosition = constrain(mouseX - barHeight / 2,
 					sliderPositionMin, sliderPositionMax);
 		}
 		if (parent.abs(newSliderPosition - sliderPosition) > 1) {
@@ -88,9 +88,9 @@ public class HScrollbar {
 	 * 
 	 * @return Whether the mouse is hovering the scrollbar
 	 */
-	public boolean isMouseOver() {
-		if (parent.mouseX > xPosition && parent.mouseX < xPosition + barWidth
-				&& parent.mouseY > yPosition && parent.mouseY < yPosition + barHeight) {
+	public boolean isMouseOver(int mouseX, int mouseY) {
+		if (mouseX > xPosition && mouseX < xPosition + barWidth
+				&& mouseY > yPosition && mouseY < yPosition + barHeight) {
 			return true;
 		} else {
 			return false;
@@ -101,8 +101,7 @@ public class HScrollbar {
 	 * @brief Draws the scrollbar in its current state
 	 */
 	public void display() {
-		//parent.noStroke();
-		parent.fill(204);
+		parent.fill(230);
 		parent.rect(xPosition, yPosition, barWidth, barHeight);
 		if (mouseOver || locked) {
 			parent.fill(0, 0, 0);

@@ -266,8 +266,7 @@ public class QuadGraph {
 
 		float area = Math.abs(0.5f * (i1 + i2 + i3 + i4));
 
-		if(debug)System.out.println(area);
-		System.out.println(area);
+		if(debug) System.out.println(area);
 
 		boolean valid = (area < max_area && area > min_area);
 

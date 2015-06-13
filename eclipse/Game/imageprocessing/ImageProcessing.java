@@ -44,10 +44,13 @@ public class ImageProcessing extends PApplet{
 
 	// The following is hard code which can't be changed during execution (yet)
 	/**
-	 * Set to true if you want to use the camera feed,
+	 * Set to true if you want to use the the image processor,
 	 * false for static image.
 	 */
-	private final boolean useCamera = true;
+	private final boolean useImgProc = true;
+	/**
+	 * Choose between video or camera feed (true for video).
+	 */
 	private final boolean useVideo = true;
 	private Movie movie;
 	/**
@@ -81,7 +84,7 @@ public class ImageProcessing extends PApplet{
 			movie.loop();
 			size(640,480+accuHeight);
 		}
-		else if(!useCamera) {
+		else if(!useImgProc) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
 			image.resize((int)((image.width)*scaling), (int)((image.height)*scaling));
 			size(640,480+accuHeight);
@@ -113,7 +116,7 @@ public class ImageProcessing extends PApplet{
 		if(useVideo){
 			drawVideo();
 		}
-		else if(useCamera) {
+		else if(useImgProc) {
 			drawCam();		
 		}else{
 			drawPic();
@@ -614,7 +617,7 @@ public class ImageProcessing extends PApplet{
 						fill(color(min(255,random.nextInt(300)),150,150,30));				
 							}else
 					 */
-					if(useCamera){
+					if(useImgProc){
 						fill(color(35, 15, 170, 140));
 					} else {
 						fill(color(min(255,random.nextInt(300)), min(255,random.nextInt(300)), min(255,random.nextInt(255)),30));

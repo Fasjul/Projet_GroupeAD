@@ -8,7 +8,7 @@ import ddf.minim.Minim;
 import imageprocessing.BlobDetection;
 import imageprocessing.ImageProcessing;
 import processing.core.*;
-import processing.event.*;
+import tools.HScrollbar;
 import objects.*;
 
 
@@ -20,25 +20,18 @@ public class GameApplet extends PApplet {
 
 	public GameManager game;
 
-	// Mouse variables
-	private int mX = 0;
-	private int mY = 0;
-	private int bX = 0;
-	private int bY = 0;
-
 	private PGraphics gameGraphics;
 	private PGraphics statGraphics;
 
 	private ImageProcessing imageProc;
 	private int frame = 0;
-	/**
-	 * Mouse scroll amount (between -100 and 100)
-	 */
-	private int mouseScroll = 0;
+	
+	private HScrollbar hscrollbar;
 	
 	Minim minim ;
 	AudioPlayer player;
 
+	@Override
 	public void setup() {
 
 		size(1190,710, P2D);
@@ -46,9 +39,8 @@ public class GameApplet extends PApplet {
 
 		gameGraphics = createGraphics(600, 600, P3D);
 		statGraphics = createGraphics(600, 110, P2D);
-
-		bX = width/2;
-		bY = height/2;
+		
+		hscrollbar = new HScrollbar(this, 200, gameGraphics.height+93, 340, 10);
 
 		// Initialize some constants
 		final int boxWidth = 400;
@@ -71,21 +63,17 @@ public class GameApplet extends PApplet {
 
 	}
 
+	@Override
 	public void draw() {
-		frame++;
+		if(!game.hold) frame++;
 		pushMatrix();
-		translate(640,0);
-		game.draw();
+			translate(640,0);
+			game.draw();
+			hscrollbar.display();
 		popMatrix();
 	}
 
-	/*
-	==============================================
-	=                                            =
-	=            KEYBOARD EVENTS                 =
-	=                                            =
-	==============================================
-	 */
+	@Override
 	public void keyPressed() {
 		if(key == CODED) {
 			if(keyCode == SHIFT) {
@@ -101,6 +89,7 @@ public class GameApplet extends PApplet {
 		}
 	}
 
+	@Override
 	public void keyReleased(){
 		if(key == CODED) {
 			if(keyCode == SHIFT) {
@@ -124,29 +113,15 @@ public class GameApplet extends PApplet {
 		return obstaclesPos;
 	}
 
-	/*
-	==============================================
-	=                                            =
-	=              MOUSE EVENTS                  =
-	=                                            =
-	==============================================
-	 */
-
-	/**
-	 * Saves coordinates of the mouse when pressed down for difference (used for mouse drag)
-	 */
+	@Override
 	public void mousePressed() {
-		// Save the coordinates of the 
-		// start of the drag.
-		if(!game.hold) {
-			mX = mouseX ;//- bX;
-			mY = mouseY ;//- bY;
-		}
+		hscrollbar.update(mouseX-640, mouseY);
 	}
 
 	/**
 	 * Adds a cylinder to the game when the mouse is clicked.
 	 */
+	@Override
 	public void mouseClicked(){
 		Bottle ghost = game.obstacles.ghost;
 		if(game.hold && (!ghost.collisionWithMover(game.mover))) {
@@ -167,74 +142,17 @@ public class GameApplet extends PApplet {
 		} else {
 			noFill();
 		}
+		hscrollbar.update(mouseX-640, mouseY);
 	}
 
-	/**
-	 * Saves coordinates of the mouse when released for difference (used for mouse drag).
-	 */
+	@Override
 	public void mouseReleased() {
-		if(!game.hold){
-			bX = Math.round(clamp(bX, 0, width));
-			bY = Math.round(clamp(bY, 0, height)); 
-			noStroke();
-		}
+		hscrollbar.update(mouseX-640, mouseY);
 	}
 
-	public void mouseWheel(MouseEvent event){
-		float e = event.getCount();
-		mouseScroll += e;
-		mouseScroll = (int)clamp(mouseScroll,-100,100);
-		game.speed = (float)Math.pow(2f, mouseScroll/25f);
-	}
-
-	/**
-	 * <P>Rotates the plane along the mouse drag with the other variables.<br/>
-	 * <I>Happens when mouse is pressed and moves.</I></P>
-	 */
+	@Override
 	public void mouseDragged() {
-		if(!game.hold){
-			float PoT = PI/3; // PI over Three
-			bX = mouseX - mX;
-			bY = mouseY - mY; 
-			game.rotX = map(bY, 0, height, PoT, -PoT);
-			game.rotZ = map(bX, 0,  width, -PoT, PoT);  
-			noStroke();
-			game.rotX = clamp(game.rotX, -PoT, PoT);
-			game.rotZ = clamp(game.rotZ, -PoT, PoT);
-		}
-	}
-
-	/**
-	 * Tells whether a value is getting clamped for parameters val, min and max.
-	 * @param val Value to consider
-	 * @param min Minimum the value is allowed to be
-	 * @param max Maximum the value is allowed to be
-	 * @return <b style="color: blue">true</b> when the value is less than <b>min</b> or greater than <b>max</b>, otherwise <b style="color: blue">false</b>.
-	 */
-	public boolean clampBool(float val, float min, float max) {
-		return (val < min || val > max);
-	}
-
-	/**
-	 * Clamps a value between a minimum value and a maximum value.
-	 * @param val Value to clamp
-	 * @param min Minimum of the value
-	 * @param max Maximum of the value
-	 * @return Returns : 
-	 * <ul>
-	 *  <li><b>min</b> if the value is less than <b>min</b>;</li>
-	 *  <li><b>max</b> if the value is greater than <b>max</b>;</li>
-	 *  <li><b>val</b> otherwise.</li>
-	 * </ul>
-	 */
-	public float clamp(float val, float min, float max) {
-		if(val < min) {
-			return min;
-		} else if(val > max) {
-			return max;
-		} else {
-			return val;
-		}
+		hscrollbar.update(mouseX-640, mouseY);
 	}
 
 	public int frame() {
