@@ -52,8 +52,7 @@ public class GameApplet extends PApplet {
 		final int cylinderBaseRadius = 30;
 		final int cylinderBaseHeight = 30;
 		final int cylinderResolution = 40;
-		//
-		// TODO: Create and send Graphics variables here:
+		
 		Box box = new Box(gameGraphics, boxWidth, boxHeight, boxDepth);
 		Mover mover = new Mover(this, gameGraphics, ballRadius);
 		ObstacleManager obstacles = new ObstacleManager(this, gameGraphics, cylinderBaseRadius, cylinderBaseHeight, cylinderResolution,new Minim(this));
