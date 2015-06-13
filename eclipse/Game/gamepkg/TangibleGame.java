@@ -38,8 +38,9 @@ public class TangibleGame extends PApplet {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			// If Thread is interrupted (should not happen)
 			e.printStackTrace();
+			System.exit(-1);
 		}
 		// initialize Game frame
 		game.init();
