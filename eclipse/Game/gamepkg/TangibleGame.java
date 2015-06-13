@@ -4,6 +4,7 @@ package gamepkg;
 import ddf.minim.*;
 import imageprocessing.ImageProcessing;
 import processing.core.PApplet;
+import processing.core.PImage;
 
 public class TangibleGame extends PApplet {
 	/**
@@ -15,7 +16,7 @@ public class TangibleGame extends PApplet {
 	private static GameApplet game;
 	private Minim minim;
 	private AudioPlayer player;
-	private Boolean musicOn = false;
+	public Boolean musicOn = false;
 	
 	@Override
 	public void setup(){
@@ -26,6 +27,7 @@ public class TangibleGame extends PApplet {
 		imageProc = new ImageProcessing();
 		game = new GameApplet();
 		game.setImageProcessing(imageProc);
+		game.setParent(this);
 
 		// Assign children
 		this.add(imageProc);
@@ -47,10 +49,15 @@ public class TangibleGame extends PApplet {
 		game.start();
 		minim = new Minim(this);
 		player = minim.loadFile("resources/ThemeDaft.mp3");
+		player.loop();
 	}
 	@Override
 	public void draw(){
-		if(musicOn) player.play();
+		if(musicOn)
+			player.unmute();
+		else
+			player.mute();
+		
 	}
 	
 }

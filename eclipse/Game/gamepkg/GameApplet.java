@@ -26,6 +26,9 @@ public class GameApplet extends PApplet {
 	private ImageProcessing imageProc;
 	private int frame = 0;
 	
+	private TangibleGame tangParent;
+	private PImage sound, no_sound;
+	
 	HScrollbar hscrollbar;
 	
 	Minim minim ;
@@ -58,8 +61,8 @@ public class GameApplet extends PApplet {
 		ObstacleManager obstacles = new ObstacleManager(this, gameGraphics, cylinderBaseRadius, cylinderBaseHeight, cylinderResolution,new Minim(this));
 		
 		game = new GameManager(this, gameGraphics, statGraphics, box, mover, obstacles, imageProc);
-		
-
+		sound = loadImage("resources/sound_icon.png");
+		no_sound = loadImage("resources/no_sound_icon.png");
 	}
 
 	@Override
@@ -69,6 +72,11 @@ public class GameApplet extends PApplet {
 			translate(640,0);
 			game.draw();
 			hscrollbar.display();
+			if(tangParent != null && tangParent.musicOn) {
+				image(sound, 20, 20);
+			} else {
+				image(no_sound, 20, 20);
+			}
 		popMatrix();
 	}
 
@@ -145,6 +153,22 @@ public class GameApplet extends PApplet {
 			hscrollbar.update(mouseX-640, mouseY);
 			game.drawBarChart();
 		}
+		
+		checkSoundClick();
+	}
+	
+	private void checkSoundClick() {
+		if(tangParent != null) {
+			boolean musicOn = tangParent.musicOn;
+			int mouseOffset = 640;
+			
+			int xChk = mouseX - mouseOffset - 20;
+			int yChk = mouseY - 20;
+			
+			if(0 <= xChk && xChk < sound.width && 0 <= yChk && yChk < sound.height) {
+				tangParent.musicOn = !musicOn;
+			}
+		}
 	}
 
 	@Override
@@ -183,9 +207,12 @@ public class GameApplet extends PApplet {
 		return getGamePos((int)screenPos.x, (int)screenPos.y);
 	}
 
-	public boolean setImageProcessing(ImageProcessing input){
+	public void setImageProcessing(ImageProcessing input){
 		imageProc = input;
-		return true;
+	}
+	
+	public void setParent(TangibleGame applet) {
+		this.tangParent = applet;
 	}
 
 }
