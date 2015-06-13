@@ -11,6 +11,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 import processing.video.Capture;
+import processing.video.Movie;
 
 
 public class ImageProcessing extends PApplet{
@@ -47,7 +48,8 @@ public class ImageProcessing extends PApplet{
 	 * false for static image.
 	 */
 	private final boolean useCamera = true;
-
+	private final boolean useVideo = false;
+	private Movie movie;
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
 	 */
@@ -74,7 +76,12 @@ public class ImageProcessing extends PApplet{
 	@Override
 	public void setup() {
 		tabInitialization();
-		if(!useCamera) {
+		if(useVideo){
+			size(200,200);
+			movie = new Movie(this, "resources/testvideo.mp4");
+			movie.play();
+		}
+		else if(!useCamera) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
 			image.resize((int)((image.width)*scaling), (int)((image.height)*scaling));
 			size(640,480+accuHeight);
@@ -96,10 +103,17 @@ public class ImageProcessing extends PApplet{
 		accuImg = new PImage(200,200);
 		
 	}
+	
+	void movieEvent(Movie m){
+		m.read();
+	}
 
 	@Override
 	public void draw(){
-		if(useCamera) {
+		if(useVideo){
+			drawVideo();
+		}
+		else if(useCamera) {
 			drawCam();		
 		}else{
 			drawPic();
@@ -142,6 +156,10 @@ public class ImageProcessing extends PApplet{
 		hsbFilterRed = hsbFilter(camera,0,20,10,255,30);
 		image(hsbFilterRed, 0, 480);
 
+	}
+	
+	private void drawVideo(){
+		image(movie,0,0);
 	}
 
 	private void drawPic(){

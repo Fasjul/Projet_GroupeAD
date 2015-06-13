@@ -15,7 +15,7 @@ public class TangibleGame extends PApplet {
 	private static GameApplet game;
 	private Minim minim;
 	private AudioPlayer player;
-	private Boolean musicOn = false;
+	private Boolean musicOn = true;
 	
 	@Override
 	public void setup(){

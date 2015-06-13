@@ -1,5 +1,7 @@
 package objects;
 
+import java.util.ArrayList;
+
 import gamepkg.*;
 import processing.core.*;
 
@@ -91,9 +93,12 @@ public class Mover {
 	}
 
 	public void checkCollision(ObstacleManager obstacles){
+		
+		ArrayList<Bottle> toRemove = new ArrayList<Bottle>();
+		
 		for(Bottle cyl : obstacles.obstacleList){
 			if(cyl.collisionWithMover(this)){
-
+				/*
 				PVector normal = new PVector(cyl.location.x - this.location.x, cyl.location.y - this.location.y);
 
 				PVector n = normal.get();
@@ -105,13 +110,19 @@ public class Mover {
 				normal.mult(velocity.dot(normal));
 				normal.mult(2);
 				velocity.sub(normal);
-
+				*/
+				toRemove.add(cyl);
+				
 				float mag = velocity.mag();
 				if(mag >= SCORE_MIN) {
 					lastScore = mag * SCORE_RATIO;
 					totalScore += lastScore;		
 				}
 			}
+		}
+		//update the obstacleList
+		for(Bottle c : toRemove){
+			obstacles.remove(c);
 		}
 	}
 }
