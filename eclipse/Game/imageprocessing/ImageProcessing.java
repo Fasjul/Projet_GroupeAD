@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import ddf.minim.AudioPlayer;
-import ddf.minim.Minim;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -226,7 +224,6 @@ public class ImageProcessing extends PApplet{
 			int selected = -1;
 			for(int i=0; i<cameras.length; i++) {
 				String[] params = cameras[i].split(",");
-				String name = params[0].substring(params[0].indexOf('=')+1);
 				String size = params[1].substring(params[1].indexOf('=')+1);
 				String fps  = params[2].substring(params[2].indexOf('=')+1);
 				
@@ -347,8 +344,7 @@ public class ImageProcessing extends PApplet{
 			float b = brightness(c);
 
 			if(h >= hueMin && h < hueMax && b >= bMin && b < bMax && s >= sMin) {
-				result.pixels[i] = color(2*s); // TODO: review this
-				// does seem to work pretty well with camera feed
+				result.pixels[i] = color(2*s);
 			} else {
 				result.pixels[i] = color(0);
 			}
@@ -656,10 +652,6 @@ public class ImageProcessing extends PApplet{
 		PVector center = new PVector((a.x+b.x)/2,(a.y+b.y)/2);
 
 		Collections.sort(quad, new CWComparator(center));
-
-		//TODO:
-		//Re-order the corners so that the first one is the closest to the origin(0,0) of the image.
-		//You can Use Collections.rotate to shift the corners inside the quad.size()
 		PVector upperLeft = quad.get(0);
 		for(int i = 0; i<4; i++){
 			if(quad.get(i).x<=upperLeft.x && quad.get(i).y<upperLeft.y){
