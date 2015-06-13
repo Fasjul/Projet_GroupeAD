@@ -122,7 +122,7 @@ public class Mover {
 		}
 		//update the obstacleList
 		for(Bottle c : toRemove){
-			obstacles.remove(c);
+			obstacles.destroy(c);
 		}
 	}
 }

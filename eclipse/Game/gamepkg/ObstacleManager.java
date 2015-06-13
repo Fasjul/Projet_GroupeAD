@@ -38,20 +38,20 @@ public class ObstacleManager implements Drawable {
 		detectedObstacles = new ArrayList<PVector>();
 		
 		minim = minArg;
-		playerBreak = minim.loadFile("resources/Glass_Break.mp3");
+		playerBreak = minim.loadFile("resources/Glass_Break.wav");
 		playerBlop = minim.loadFile("resources/Blop.mp3");
 	}
 
 	public Bottle add(Bottle obstacle) {
 		obstacleList.add(obstacle);
-		playerBlop.play();
-		playerBlop.rewind();
 		return obstacle;
 	}
 
 	public Bottle add(PVector position) {
 		Bottle cyl = new Bottle(GAME, GAMEGFX, position, BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
 		obstacleList.add(cyl);
+		playerBlop.play();
+		playerBlop.rewind();
 		return cyl;
 	}
 
