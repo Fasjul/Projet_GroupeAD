@@ -66,6 +66,15 @@ public class HScrollbar {
 					+ (newSliderPosition - sliderPosition);
 		}
 	}
+	
+	/**
+	 * Force set slider position
+	 */
+	public void forceSet(float sliderPosition) {
+		sliderPosition = constrain(sliderPosition, 0, 1);
+		this.sliderPosition = xPosition + sliderPosition*(barWidth - barHeight);
+		this.newSliderPosition = this.sliderPosition;
+	}
 
 	/**
 	 * @brief Clamps the value into the interval

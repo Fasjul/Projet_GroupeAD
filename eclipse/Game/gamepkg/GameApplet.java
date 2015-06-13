@@ -26,7 +26,7 @@ public class GameApplet extends PApplet {
 	private ImageProcessing imageProc;
 	private int frame = 0;
 	
-	private HScrollbar hscrollbar;
+	HScrollbar hscrollbar;
 	
 	Minim minim ;
 	AudioPlayer player;
@@ -116,6 +116,7 @@ public class GameApplet extends PApplet {
 	@Override
 	public void mousePressed() {
 		hscrollbar.update(mouseX-640, mouseY);
+		game.drawBarChart();
 	}
 
 	/**
@@ -141,18 +142,22 @@ public class GameApplet extends PApplet {
 			}
 		} else {
 			noFill();
+			
+			hscrollbar.update(mouseX-640, mouseY);
+			game.drawBarChart();
 		}
-		hscrollbar.update(mouseX-640, mouseY);
 	}
 
 	@Override
 	public void mouseReleased() {
 		hscrollbar.update(mouseX-640, mouseY);
+		game.drawBarChart();
 	}
 
 	@Override
 	public void mouseDragged() {
 		hscrollbar.update(mouseX-640, mouseY);
+		game.drawBarChart();
 	}
 
 	public int frame() {
@@ -171,12 +176,6 @@ public class GameApplet extends PApplet {
 
 		float x = game.box.width*(mouseX-width/2f)/(width/2)*(eZ-pZ)/eZ;
 		float y = game.box.depth*(mouseY-height/2f)/(height/2)*(eZ-pZ)/eZ;
-
-		//		float x = clamp(mouseX, 124, 600-124);
-		//		float y = clamp(mouseY, 124, 600-124);
-
-		//		x = map(x, 124, 600-124, -game.box.width/2, game.box.width/2);
-		//		y = map(y, 124, 600-124, -game.box.depth/2, game.box.depth/2);
 
 		return new PVector(x,y);
 	}

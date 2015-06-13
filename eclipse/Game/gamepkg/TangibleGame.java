@@ -20,7 +20,7 @@ public class TangibleGame extends PApplet {
 	@Override
 	public void setup(){
 		// Set multi-container size
-		size(1190,2*480);
+		size(1190, 710);
 
 		// Create Sub-Applets
 		imageProc = new ImageProcessing();

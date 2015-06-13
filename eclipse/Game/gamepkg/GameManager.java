@@ -277,7 +277,19 @@ public class GameManager {
 		}
 	}
 	
-	private void drawBarChart() {
+	private float factor() {
+		float pos = GAME.hscrollbar.getPos();
+		float a = 22/5f;
+		float b = -3/5f;
+		float c = 0.2f;
+		
+		return a*pos*pos + b*pos + c;
+	}
+	
+	/**
+	 * Refreshes the bar chart in the data-visualization.
+	 */
+	public void drawBarChart() {
 		barChart.rectMode(PConstants.CORNER);
 		barChart.beginDraw();
 			barChart.background(statBgColor);
@@ -286,8 +298,9 @@ public class GameManager {
 			
 			int i = 0;
 			for(Float f : pot) {
-				float calc = f/maxScore*80;
-				barChart.rect((i++) * (statBarWidth+statBarSpacing), barChart.height-calc-1, statBarWidth, calc);
+				float calc = f/maxScore*70;
+				float factor = factor();
+				barChart.rect((i++) * (factor*statBarWidth+statBarSpacing), barChart.height-calc-1, statBarWidth*factor, calc+10);
 			}
 		barChart.endDraw();
 	}
