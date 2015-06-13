@@ -277,11 +277,19 @@ public class GameManager {
 		}
 	}
 	
+	/**
+	 * Quadratic factor variation function.</br>
+	 * 0.0 -> 0.1 ;
+	 * 0.5 -> 1.0 ;
+	 * 1.0 -> 3.0
+	 * @return The wanted factor given as input the scroll-bar position in [0,1].
+	 */
 	private float factor() {
 		float pos = GAME.hscrollbar.getPos();
-		float a = 22/5f;
-		float b = -3/5f;
-		float c = 0.2f;
+		
+		float a = 11/5f;
+		float b = 7/5f;
+		float c = 0.1f;
 		
 		return a*pos*pos + b*pos + c;
 	}
@@ -300,7 +308,7 @@ public class GameManager {
 			for(Float f : pot) {
 				float calc = f/maxScore*70;
 				float factor = factor();
-				barChart.rect((i++) * (factor*statBarWidth+statBarSpacing), barChart.height-calc-1, statBarWidth*factor, calc+10);
+				barChart.rect((i++) * factor * (statBarWidth+statBarSpacing), barChart.height-calc-1, statBarWidth*factor, calc+10);
 			}
 		barChart.endDraw();
 	}
