@@ -48,7 +48,7 @@ public class ImageProcessing extends PApplet{
 	 * false for static image.
 	 */
 	private final boolean useCamera = true;
-	private final boolean useVideo = true;
+	private final boolean useVideo = false;
 	private Movie movie;
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
@@ -79,7 +79,7 @@ public class ImageProcessing extends PApplet{
 		if(useVideo){
 			movie = new Movie(this, "resources/testvideo.mp4");
 			movie.loop();
-			size(640,480+accuHeight);
+			size(640,480);
 		}
 		else if(!useCamera) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
@@ -144,9 +144,9 @@ public class ImageProcessing extends PApplet{
 		
 		backWhite.resize(sobel.width+2, sobel.height+2);
 		image(camera, 0, 0);
-		image(accuImg,0, camera.height);
-		image(backWhite,0,camera.height);
-		image(sobel, 0, camera.height);
+		//image(accuImg,0, camera.height);
+		//image(backWhite,0,camera.height);
+		//image(sobel, 0, camera.height);
 		hsb.resize(200, 200);
 		image(hsb,sobel.width,0);
 		returnedCorners = hough(sobel, 5, tabCos, tabSin);
@@ -154,7 +154,7 @@ public class ImageProcessing extends PApplet{
 		
 		//hsbFilter for the objects detection
 		hsbFilterRed = hsbFilter(camera,0,20,10,255,30);
-		image(hsbFilterRed, 0, 480);
+		//image(hsbFilterRed, 0, 480);
 
 	}
 	
@@ -180,12 +180,12 @@ public class ImageProcessing extends PApplet{
 		
 		backWhite.resize(sobel.width+2, sobel.height+2);
 		image(camera, 0, 0);
-		image(accuImg,0, camera.height);
-		image(backWhite,0,camera.height);
-		image(sobel, 0, camera.height);
+		//image(accuImg,0, camera.height);
+		//image(backWhite,0,camera.height);
+		//image(sobel, 0, camera.height);
 		hsb.resize(200, 200);
-		image(hsb,sobel.width,0);
-		returnedCorners = hough(sobel, 6, tabCos, tabSin);
+		//image(hsb,sobel.width,0);
+		returnedCorners = hough(sobel, 5, tabCos, tabSin);
 		
 		
 		//hsbFilter for the objects detection
