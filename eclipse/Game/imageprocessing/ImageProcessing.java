@@ -144,12 +144,12 @@ public class ImageProcessing extends PApplet{
 		
 		backWhite.resize(sobel.width+2, sobel.height+2);
 		image(camera, 0, 0);
-		//image(accuImg,0, camera.height);
-		//image(backWhite,0,camera.height);
-		//image(sobel, 0, camera.height);
-		hsb.resize(200, 200);
-		image(hsb,sobel.width,0);
 		returnedCorners = hough(sobel, 5, tabCos, tabSin);
+		image(accuImg,0, camera.height);
+		image(backWhite,0,camera.height);
+		image(sobel, 0, camera.height);
+		//hsb.resize(200, 200);
+		//image(hsb,sobel.width,0);
 		
 		
 		//hsbFilter for the objects detection
