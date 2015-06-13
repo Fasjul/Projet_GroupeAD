@@ -10,7 +10,7 @@ public class QuadGraph {
 
 	List<int[]> cycles = new ArrayList<int[]>();
 	int[][] graph;
-	private static boolean debug = false;
+	private static boolean debug = true;
 
 	public void build(List<PVector> lines, int width, int height) {
 
@@ -282,7 +282,8 @@ public class QuadGraph {
 
 		// cos(70deg) ~= 0.3
 		// cos(60deg) = 0.5
-		float min_cos = 0.5f;
+		// cos(30deg) ~= 0.154
+		float min_cos = 0.154f;
 
 		PVector v21= PVector.sub(c1, c2);
 		PVector v32= PVector.sub(c2, c3);

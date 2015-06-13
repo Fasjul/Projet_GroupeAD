@@ -48,7 +48,7 @@ public class ImageProcessing extends PApplet{
 	 * false for static image.
 	 */
 	private final boolean useCamera = true;
-	private final boolean useVideo = false;
+	private final boolean useVideo = true;
 	private Movie movie;
 	/**
 	 * Which board to use when drawing the static image (must be between 1 and 4!).
@@ -63,7 +63,7 @@ public class ImageProcessing extends PApplet{
 	/**
 	 * Draw options
 	 */
-	private boolean plotLines = false;
+	private boolean plotLines = true;
 	private boolean showQuads = true;
 
 	
@@ -77,9 +77,9 @@ public class ImageProcessing extends PApplet{
 	public void setup() {
 		tabInitialization();
 		if(useVideo){
-			size(200,200);
 			movie = new Movie(this, "resources/testvideo.mp4");
-			movie.play();
+			movie.loop();
+			size(640,480+accuHeight);
 		}
 		else if(!useCamera) {
 			image = loadImage("resources/boards/board" + board + ".jpg");
@@ -159,7 +159,38 @@ public class ImageProcessing extends PApplet{
 	}
 	
 	private void drawVideo(){
-		image(movie,0,0);
+		movie.read();
+		camera = movie.get();
+		sobel = applyAll(camera);
+		hsb = hsbFilter(camera);
+		if(sobel.height>0 && sobel.width>0) initialized = true;
+		else initialized = false;
+		if(!initialized){
+			sobel = new PImage(200,200);
+			hsb = new PImage(200,200);
+		}else{
+			//sobel.resize(sobel.width/2,sobel.height/2);
+			hsb.resize(sobel.width, sobel.height);
+			TwoDThreeD dd = new TwoDThreeD(camera.width,camera.height);
+			if(returnedCorners.size()!=0){
+				PVector rotations = dd.get3DRotations(sortCorners(returnedCorners));
+				boardRotations.set(rotations);
+			}
+		}
+		
+		backWhite.resize(sobel.width+2, sobel.height+2);
+		image(camera, 0, 0);
+		image(accuImg,0, camera.height);
+		image(backWhite,0,camera.height);
+		image(sobel, 0, camera.height);
+		hsb.resize(200, 200);
+		image(hsb,sobel.width,0);
+		returnedCorners = hough(sobel, 6, tabCos, tabSin);
+		
+		
+		//hsbFilter for the objects detection
+		hsbFilterRed = hsbFilter(camera,0,20,10,255,30);
+		//image(hsbFilterRed, 0, 480);
 	}
 
 	private void drawPic(){
@@ -575,7 +606,7 @@ public class ImageProcessing extends PApplet{
 			PVector c3 = new PVector(c34.x,c34.y);
 			PVector c4 = new PVector(c41.x,c41.y);
 
-			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 8000) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
+			if(QuadGraph.isConvex(c1, c2, c3, c4)&&QuadGraph.validArea(c1, c2, c3, c4, 1000000 , 800) && QuadGraph.nonFlatQuad(c1, c2, c3, c4)){
 				// Draw options
 				if(showQuads){
 					/*
