@@ -89,4 +89,8 @@ public class ObstacleManager implements Drawable {
 			add(detected);
 		}
 	}
+	
+	public void clearObstacles(){
+		obstacleList.clear();
+	}
 }

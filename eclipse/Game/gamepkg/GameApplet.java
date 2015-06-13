@@ -93,6 +93,11 @@ public class GameApplet extends PApplet {
 				//Run the blob detection
 				game.obstacles.detectedObstacles = runBlobDetection();
 			}
+		}else if(game.hold){
+			if(key == 88){
+				game.obstacles.clearObstacles();
+				System.out.println("All obstacles have been removed!");
+			}
 		}
 	}
 
