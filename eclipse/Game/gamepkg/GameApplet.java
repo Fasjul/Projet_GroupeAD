@@ -136,17 +136,16 @@ public class GameApplet extends PApplet {
 			if(mouseButton == LEFT) {
 				Bottle toAdd = game.obstacles.add(ghost.location);
 				toAdd.setColor(255, 255, 51);
-
-			} else if(mouseButton == RIGHT) {
-				System.out.println("Feature not implemented yet");
-				
+			}
+	
+		} else if(mouseButton == RIGHT) {
+				ArrayList<Bottle> toRemove = new ArrayList<Bottle>();
 				for(Bottle c : game.obstacles.obstacleList) {
 					if(ghost.collisionWith(c)) {
-						game.obstacles.obstacleList.remove(c);
+						toRemove.add(c);
 					}
 				}
-				 
-			}
+				game.obstacles.obstacleList.removeAll(toRemove);
 		} else {
 			noFill();
 			
