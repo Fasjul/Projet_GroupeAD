@@ -104,7 +104,7 @@ public class GameManager {
 		//update position only if rotation is not too small or too big
 		if(diffX>0.01 && diffX<Math.PI/2) rotX = input.boardRotations.x;
 		if(diffY>0.01 && diffY<Math.PI/2) rotZ = -input.boardRotations.y;
-		if(diffZ>0.01 && diffZ<Math.PI/2) rotY = -input.boardRotations.z;
+		if(diffZ>0.01 && diffZ<Math.PI/2) rotY = input.boardRotations.z;
 		
 	}
 
