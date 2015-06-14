@@ -67,8 +67,6 @@ public class Bottle implements Drawable{
 
 		float totRadius = this.radius + that.radius;
 		float squareRadius = totRadius*totRadius;
-
-		System.out.println("Collision!");
 		
 		return squareDist <= squareRadius;
 	}
