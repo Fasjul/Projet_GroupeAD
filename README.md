@@ -24,19 +24,19 @@ Arriverez-vous à dépasser les 10'000 points?
 ###COMMANDES DE JEU
 
 ####Rotations de la planche Lego :
-  Inclinaison gauche : Inclinaison gauche
-  Inclinaison droite : Inclinaison droite
-  Inclinaison avant : Inclinaison arrière
-  Inclinaison arrière : Inclinaison avant
-  Rotation gauche : Rotation gauche
-  Rotation droite : Rotation droite
+  Inclinaison gauche : Inclinaison gauche.
+  Inclinaison droite : Inclinaison droite.
+  Inclinaison avant : Inclinaison arrière.
+  Inclinaison arrière : Inclinaison avant.
+  Rotation gauche : Rotation gauche.
+  Rotation droite : Rotation droite.
   
 ####Modifications de l'environnement de jeu :
 
-  SHIFT : Bloquer le jeu et ajouter les obstacles détectés automatiquement par la webcam
-  SHIFT + Right Click : placer un obstacle
-  SHIFT + Left Click : Retirer un obstacle (non-implémenté)
-  SHIT + X : Supprimer tous les obstacles
+  SHIFT : Bloquer le jeu et ajouter les obstacles détectés automatiquement par la webcam.
+  SHIFT + Right Click : placer un obstacle.
+  SHIFT + Left Click : Retirer un obstacle (non-implémenté).
+  SHIT + X : Supprimer tous les obstacles.
   
 ####MERCI
 
