@@ -29,7 +29,7 @@ Arriverez-vous à dépasser les 10'000 points?
   3. Inclinaison avant : Inclinaison arrière.
   4. Inclinaison arrière : Inclinaison avant.
   5. Rotation gauche : Rotation gauche.
-  6.Rotation droite : Rotation droite.
+  6. Rotation droite : Rotation droite.
   
 ####Modifications de l'environnement de jeu :
 
