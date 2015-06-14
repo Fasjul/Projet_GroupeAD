@@ -57,7 +57,10 @@ public class Mover {
 	public void draw(){
 		GAMEGFX.noStroke();
 		GAMEGFX.fill(127);
+		GAMEGFX.pushMatrix();
+		GAMEGFX.translate(+radius,0, -radius);
 		GAMEGFX.sphere(this.radius);
+		GAMEGFX.popMatrix();
 	}
 
 
