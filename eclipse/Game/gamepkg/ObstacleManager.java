@@ -2,13 +2,14 @@ package gamepkg;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import objects.*;
 import processing.core.*;
 import ddf.minim.*;
 
 public class ObstacleManager implements Drawable {
-	public final ArrayList<Bottle> obstacleList;
+	public final CopyOnWriteArrayList<Bottle> obstacleList;
 	public List<PVector> detectedObstacles;
 	public final Bottle ghost;
 
@@ -26,13 +27,13 @@ public class ObstacleManager implements Drawable {
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
 
-		this.obstacleList = new ArrayList<Bottle>();
+		this.obstacleList = new CopyOnWriteArrayList<Bottle>();
 
 		this.BASE_HEIGHT = baseHeight;
 		this.BASE_RADIUS = baseRadius;
 		this.BASE_RESOLUTION = baseResolution;
 
-		ghost = new Bottle(GAME, GAMEGFX, new PVector(0,0), BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
+		ghost = new Bottle(GAME, GAMEGFX, new PVector(0,0), BASE_RADIUS, BASE_HEIGHT, BASE_RESOLUTION);
 		ghost.setGhost(true);
 		
 		detectedObstacles = new ArrayList<PVector>();
@@ -48,7 +49,7 @@ public class ObstacleManager implements Drawable {
 	}
 
 	public Bottle add(PVector position) {
-		Bottle cyl = new Bottle(GAME, GAMEGFX, position, BASE_HEIGHT, BASE_RADIUS, BASE_RESOLUTION);
+		Bottle cyl = new Bottle(GAME, GAMEGFX, position, BASE_RADIUS, BASE_HEIGHT, BASE_RESOLUTION);
 		obstacleList.add(cyl);
 		playerBlop.play();
 		playerBlop.rewind();
