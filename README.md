@@ -14,7 +14,7 @@ pas autorisée et seul ce groupe sera tenu responsable des conséquences.
 Munissez-vous d'une planche Lego© verte, et controllez la sphère!
 
 Le but du jeu est de détruire les obstacles en déplaçant la sphère.
-Lorsque la sphère rencontre une bouteille, elle détruit la bouteille et le score augmente. Plus la collision est puissante, plus vous gagnerez de points!
+Lorsque la sphère rencontre une bouteille, elle détruit la bouteille et le score augmente. Plus la collision sera puissante, plus vous gagnerez de points!
 
 Cependant, si la sphère touche le bord, le score diminue.
 
