@@ -25,6 +25,7 @@ Arriverez-vous à dépasser les 10'000 points?
 
 ####Rotations de la planche Lego :
   Inclinaison gauche : Inclinaison gauche
+  
   Inclinaison droite : Inclinaison droite
   Inclinaison avant : Inclinaison arrière
   Inclinaison arrière : Inclinaison avant
