@@ -24,12 +24,8 @@ Arriverez-vous à dépasser les 10'000 points?
 ###COMMANDES DE JEU
 
 ####Rotations de la planche Lego :
-  1. Inclinaison gauche : Inclinaison gauche.
-  2. Inclinaison droite : Inclinaison droite.
-  3. Inclinaison avant : Inclinaison arrière.
-  4. Inclinaison arrière : Inclinaison avant.
-  5. Rotation gauche : Rotation gauche.
-  6. Rotation droite : Rotation droite.
+  Inclinez la planche que vous tenez dans la main dans la direction que vous voulez pour tourner la planche dans le jeu.
+  (attention: la planche doit faire face à la caméra pour être à plat dans le jeu, donc il y a un décalage de 90°)
   
 ####Modifications de l'environnement de jeu :
 
