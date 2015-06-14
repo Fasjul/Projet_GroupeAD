@@ -35,7 +35,7 @@ Arriverez-vous à dépasser les 10'000 points?
 
   7. SHIFT : Bloquer le jeu et ajouter les obstacles détectés automatiquement par la webcam.
   8. SHIFT + Left Click : placer un obstacle.
-  9. SHIFT + Right Click : Retirer un obstacle (non-implémenté).
+  9. SHIFT + Right Click : Retirer un obstacle.
   10. SHIT + X : Supprimer tous les obstacles.
   
 ####MERCI
