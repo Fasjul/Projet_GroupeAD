@@ -2,6 +2,7 @@ package objects;
 
 import gamepkg.GameApplet;
 import processing.core.PGraphics;
+import processing.core.PImage;
 import processing.core.PShape;
 import processing.core.PVector;
 
@@ -16,6 +17,7 @@ public class Bottle implements Drawable{
 	public final int resolution;
 
 	private boolean ghost = false;
+	private boolean validGhost = true;
 	private float R = 0;
 	private float G = 0;
 	private float B = 0;
@@ -23,16 +25,22 @@ public class Bottle implements Drawable{
 	public final GameApplet GAME;
 	public final PGraphics GAMEGFX;
 	public final PShape BOTTLE;
+	private final PShape BOTTLE_ERROR;
 
 
 	public Bottle(GameApplet game, PGraphics gameGraphics, PVector location, float radius, float height, int resolution){
 		this.GAME = game;
 		this.GAMEGFX = gameGraphics;
 		this.BOTTLE = GAMEGFX.loadShape("resources/bottle.obj");
+		this.BOTTLE_ERROR = GAMEGFX.loadShape("resources/bottle.obj");
+		PImage error_texture = GAME.loadImage("resources/error_texture.png");
+		BOTTLE_ERROR.setTexture(error_texture);
+		
 
 		this.radius = BOTTLE.getWidth()/2.0f;
 		
 		this.location = new PVector(location.x-this.radius,location.y-this.radius);
+		
 		this.height = BOTTLE.getHeight();
 		this.resolution = resolution;
 	}
@@ -60,6 +68,8 @@ public class Bottle implements Drawable{
 		float totRadius = this.radius + that.radius;
 		float squareRadius = totRadius*totRadius;
 
+		System.out.println("Collision!");
+		
 		return squareDist <= squareRadius;
 	}
 
@@ -77,6 +87,18 @@ public class Bottle implements Drawable{
 		return this.ghost;
 	}
 	
+	public boolean validGhost(){
+		if(isGhost()){
+			validGhost = true;
+			for(Bottle c : GAME.game.obstacles.obstacleList){
+				if(collisionWith(c)){
+					validGhost = false;
+				}
+			}
+		}
+		return validGhost;
+	}
+	
 	public void draw(){
 		GAMEGFX.pushMatrix();
 		GAMEGFX.translate(location.x+this.radius, -GAME.game.box.height, location.y+this.radius);
@@ -88,7 +110,11 @@ public class Bottle implements Drawable{
 		} else {
 			GAMEGFX.fill(GAMEGFX.color(R, G, B));
 		}
-		GAMEGFX.shape(BOTTLE,0,0);
+		if(!validGhost()){
+			GAMEGFX.shape(BOTTLE_ERROR,0,0);
+		}else{
+			GAMEGFX.shape(BOTTLE,0,0);
+		}
 		GAMEGFX.popMatrix();
 	}
 

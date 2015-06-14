@@ -159,9 +159,10 @@ public class GameManager {
 
 			Bottle ghost = GAME.game.obstacles.ghost;
 			
-			ghost.move(new PVector(GAME.mouseX-640-320+20,GAME.mouseY-240-20-20));
+			boolean ghostValid = true;
 			
-			if(ghost.collisionWithMover(mover)){
+			ghost.move(new PVector(GAME.mouseX-640-320+20,GAME.mouseY-240-20-20));
+			if(ghost.collisionWithMover(mover) || !ghostValid){
 				GAMEGFX.stroke(GAMEGFX.color(230,0,0));
 			}
 			GAMEGFX.pushMatrix();
