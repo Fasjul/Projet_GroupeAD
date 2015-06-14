@@ -51,7 +51,7 @@ public class Bottle implements Drawable{
 
 	public boolean collisionWithMover(Mover mover){
 		float distX = (mover.location.x - this.location.x);
-		float distY = (mover.location.y+mover.radius - this.location.y+radius);
+		float distY = (mover.location.y - this.location.y);
 		float squareDist = distX*distX + distY*distY;
 
 		float totRadius = this.radius + mover.radius;
@@ -95,7 +95,8 @@ public class Bottle implements Drawable{
 					validGhost = false;
 				}
 			}
-			if(collisionWithMover(GAME.game.mover)){
+			Mover mover = GAME.game.mover;
+			if(collisionWithMover(mover)){
 				validGhost = false;
 			}
 		}
