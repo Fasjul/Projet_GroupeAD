@@ -34,8 +34,8 @@ Arriverez-vous à dépasser les 10'000 points?
 ####Modifications de l'environnement de jeu :
 
   7. SHIFT : Bloquer le jeu et ajouter les obstacles détectés automatiquement par la webcam.
-  8. SHIFT + Right Click : placer un obstacle.
-  9. SHIFT + Left Click : Retirer un obstacle (non-implémenté).
+  8. SHIFT + Left Click : placer un obstacle.
+  9. SHIFT + Right Click : Retirer un obstacle (non-implémenté).
   10. SHIT + X : Supprimer tous les obstacles.
   
 ####MERCI
